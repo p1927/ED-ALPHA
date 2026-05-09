@@ -6,7 +6,7 @@
   <img src="docs/images/app.gif" alt="ED-Alpha app" width="760" />
 </p>
 
-# What is ED-Alpha?
+## What is ED-Alpha?
 
 - **ED-Alpha is an open benchmark for predicting future, investment-relevant corporate events.** At a fixed prediction date, a model uses only public information already available, such as company metadata and recent news, to rank companies by how likely they are to later file relevant SEC Form 8-K events.
 - The ED-Alpha dashboard shows the ranked predictions, supporting news signals, matched filing outcomes, and Top-K evaluation metrics for reviewing model performance in one place.
