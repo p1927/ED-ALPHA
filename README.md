@@ -19,11 +19,11 @@ ED-Alpha is a Python 3.12.11 pipeline that ingests SEC filings and GDELT news, l
   <img src="docs/images/platform.png" alt="Platform architecture" width="240" />
 </p>
 
-## Docker quickstart
+## Quickstart
 
 Run the full stack with Docker Compose v2 (`docker compose …`): Postgres + backend (FastAPI) + frontend (Next.js) + batch runner.
 
-### 1) Prepare environment variables (.env)
+### 1. Prepare environment
 
 ```bash
 cp .env.sample .env
@@ -39,7 +39,7 @@ OPENROUTER_API_KEY=xxx        # only if you need it
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
-### 2) Build and start
+### 2. Start ED-Alpha
 
 The first start applies `db/*.sql` automatically when the DB volume is empty.
 
@@ -49,10 +49,24 @@ docker compose up -d db                 # wait until healthy
 docker compose up -d backend frontend   # ports: backend 8000 / frontend 3000
 ```
 
+### 3. Open the app
+
 - Backend docs: http://localhost:8000/docs
 - Frontend: http://localhost:3000
 
-### 3) Run batch jobs
+<p align="center">
+  <img src="docs/images/app.png" alt="UI walkthrough" width="240" />
+</p>
+
+The app UI shows filing predictions and news scores backed by the batch outputs.
+
+### 4. Prepare data
+
+These commands download SEC and GDELT data, link news to companies, create labels, score articles, and calculate metrics.
+
+Run the scripts below inside the batch container at `/app`.
+
+#### Open a batch shell
 
 Keep the batch container up and use a shell for multiple scripts:
 
@@ -60,52 +74,24 @@ Keep the batch container up and use a shell for multiple scripts:
 docker compose --profile batch up -d batch
 docker compose exec -it batch sh
 cd /app
+```
+
+#### Load company and news data
+
+```bash
+# Sync SEC company metadata and recent filings.
 python src/fetch_company_tickers.py
 python src/fetch_recent_filings.py
-# run other scripts as needed, then exit
-```
 
-One-shot example:
-
-```bash
-docker compose run --rm batch python src/fetch_recent_filings.py
-```
-
-## Batch Pipeline
-
-Run the scripts below (e.g., inside the batch container at `/app`) to populate and evaluate the dataset.
-
-1. Sync company tickers.
-
-```bash
-python src/fetch_company_tickers.py
-```
-
-2. Fetch latest filings from SEC bulk data.
-
-```bash
-python src/fetch_recent_filings.py
-```
-
-3. Pull GDELT master times (e.g., hourly intervals).
-
-```bash
+# Ingest GDELT news records for the target window.
 python src/fetch_gdelt_master_times.py
-```
-
-4. Download and store GDELT GKG records for the desired window.
-
-```bash
 python src/fetch_gdelt_gkg.py --start-time 202506010000 --end-time 202508312359
-```
 
-5. Link GDELT organizations to companies.
-
-```bash
+# Link GDELT organizations to SEC companies.
 python src/link_gdelt_gkg_companies.py
 ```
 
-6. Generate labels for filings by Item code.
+#### Create labels
 
 ```bash
 python src/generate_labels.py \
@@ -118,7 +104,7 @@ python src/generate_labels.py \
 
 Use the auto-generated `experiment_id` from this step in later commands.
 
-7. Score linked GDELT news with the LLM.
+#### Score news
 
 ```bash
 python src/score_gdelt_news.py \
@@ -131,45 +117,30 @@ python src/score_gdelt_news.py \
   --reasoning-mode thinking
 ```
 
+### 5. View results
+
 Use the auto-generated `run_id` from each scoring run when running aggregation or metrics scripts.
 
-8. Aggregate per-run scores by CIK.
-
 ```bash
+# Aggregate per-run scores by CIK.
 python src/aggregate_gdelt_run_scores.py --run-id 42
-```
 
-9. Calculate recall@k / precision@k metrics.
-
-```bash
+# Calculate recall@k / precision@k metrics.
 python src/calc_gdelt_run_metrics.py --run-id 42 --k-values 10 25 50 100
-```
 
-10. (Optional) Scrape filing item sections for inspection.
-
-```bash
+# Optional: scrape filing item sections for inspection.
 python src/scrape_filing_items.py --experiment-id 123 --delay 1
 ```
 
+Refresh the frontend and select the experiment/run: http://localhost:3000
+
 Tip: use `config/predict_config.example.json` as a template and pass `--config` to re-use the same parameters across runs. Add `--dry-run` to reporting scripts to log without writing.
-
-## UI
-
-<p align="center">
-  <img src="docs/images/app.png" alt="UI walkthrough" width="240" />
-</p>
-
-The app UI shows filing predictions and news scores backed by the batch outputs.
-
-Run with Docker (see Docker quickstart):
-
-- Backend: http://localhost:8000/docs
-- Frontend: http://localhost:3000
 
 ## Customization tips (for model and pipeline experiments)
 
 - Model choice: `batch/src/score_gdelt_news.py` accepts `--model`, so you can switch among models available via OpenRouter.
 - Prompt tuning: the LLM prompt for news scoring lives in `batch/src/llm_methods.py` (`_build_prompt_messages`). Edit the system/user messages (categories, instructions, output format) to adapt to new models or research goals.
+- Custom model evaluation: wrap your model as an article scorer that returns a 1-5 score plus reason, then run the same scoring, aggregation, and metrics steps. See [How to evaluate your model](docs/how-to-evaluate-your-model.md).
 - Label configs: `generate_labels.py` pairs predictions with filing Item codes. Adjust `--item-codes`, `--horizon-days`, and `--predict-date`, or place a JSON config (see `batch/config/predict_config.example.json`) and pass `--config`.
 - Scoring window: tune `--min-days-before` / `--max-days-before` in `score_gdelt_news.py` to shift how far back news is considered per filing.
 - Negative sampling / seeds: `filing_experiments` store `neg_multiplier` and `seed`—edit generation parameters in `generate_labels.py` to reproduce or vary experiments.
