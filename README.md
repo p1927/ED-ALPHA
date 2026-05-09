@@ -183,3 +183,4 @@ Run with Docker (see Docker quickstart):
 ## Additional Documentation
 
 - [Data model and pipeline flow](docs/data-model-and-flow.md)
+- [How to evaluate your model](docs/how-to-evaluate-your-model.md)
