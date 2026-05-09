@@ -25,7 +25,7 @@ from models import (
 # FastAPI app setup
 # ============================================================
 
-app = FastAPI(title="ED-ALPHA Demo Backend", version="0.3.0")
+app = FastAPI(title="ED-ALPHA App Backend", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,

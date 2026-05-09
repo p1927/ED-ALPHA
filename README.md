@@ -3,17 +3,17 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/demo.gif" alt="ED-Alpha demo" width="760" />
+  <img src="docs/images/app.gif" alt="ED-Alpha app" width="760" />
 </p>
 
 # ED-Alpha
 
-ED-Alpha is a Python 3.12.11 pipeline that ingests SEC filings and GDELT news, links articles to companies, scores event importance with LLMs, and evaluates recall@k / precision@k against actual filing events. The project combines a batch data pipeline with a lightweight demo UI.
+ED-Alpha is a Python 3.12.11 pipeline that ingests SEC filings and GDELT news, links articles to companies, scores event importance with LLMs, and evaluates recall@k / precision@k against actual filing events. The project combines a batch data pipeline with a lightweight app UI.
 
 ## Overview
 
 - Pipeline steps: (1) sync SEC company data and filings to build labels, (2) ingest GDELT GKG news and link them to companies, (3) score article importance with an LLM, (4) aggregate run-level scores to extract likely events and measure metrics.
-- Tech stack: Python 3.12.11, PostgreSQL, OpenAI Chat Completions API, FastAPI demo backend, Vite/PNPM frontend.
+- Tech stack: Python 3.12.11, PostgreSQL, OpenAI Chat Completions API, FastAPI app backend, Next.js/PNPM frontend.
 
 <p align="center">
   <img src="docs/images/platform.png" alt="Platform architecture" width="240" />
@@ -156,10 +156,10 @@ Tip: use `config/predict_config.example.json` as a template and pass `--config` 
 ## UI
 
 <p align="center">
-  <img src="docs/images/demo.png" alt="UI walkthrough" width="240" />
+  <img src="docs/images/app.png" alt="UI walkthrough" width="240" />
 </p>
 
-The demo UI shows filing predictions and news scores backed by the batch outputs.
+The app UI shows filing predictions and news scores backed by the batch outputs.
 
 Run with Docker (see Docker quickstart):
 

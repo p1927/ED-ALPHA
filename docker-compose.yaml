@@ -22,7 +22,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: demo/backend/Dockerfile
+      dockerfile: app/backend/Dockerfile
     env_file: .env
     environment:
       PGHOST: db
@@ -39,7 +39,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: demo/frontend/Dockerfile
+      dockerfile: app/frontend/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
     env_file:
