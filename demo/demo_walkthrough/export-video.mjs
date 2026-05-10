@@ -15,7 +15,7 @@ const audioPath = path.join(artifactDir, "narration.m4a");
 const outputPath = path.join(artifactDir, "ed-alpha-demo.mp4");
 const manifestPath = path.join(repoRoot, "public", "demo_walkthrough", "audio", "cover_vocal", "manifest.json");
 const alignmentPath = path.join(repoRoot, "public", "demo_walkthrough", "audio", "cover_vocal", "alignment.json");
-const baseUrl = process.env.DEMO_VIDEO_URL || "http://127.0.0.1:3000/demo-video";
+const baseUrl = process.env.DEMO_VIDEO_URL || "http://127.0.0.1:3000/walkthrough";
 const ffmpeg = process.env.FFMPEG || "/usr/local/bin/ffmpeg";
 
 const fps = Number(process.env.DEMO_VIDEO_FPS || 24);

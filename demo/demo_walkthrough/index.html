@@ -72,13 +72,13 @@
       <p>
         This HTML wrapper loads the real ED-ALPHA dashboard tutorial route so the UI placement stays identical
         to the original app. Start the app with <code>pnpm dev</code>, then open
-        <code>http://localhost:3000/demo-video</code> or reload this wrapper.
+        <code>http://localhost:3000/walkthrough</code> or reload this wrapper.
       </p>
     </div>
   </div>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const appUrl = params.get("app") || "http://localhost:3000/demo-video";
+    const appUrl = params.get("app") || "http://localhost:3000/walkthrough";
     const passthrough = new URL(appUrl, window.location.href);
 
     for (const key of ["t", "paused", "speed", "audio"]) {

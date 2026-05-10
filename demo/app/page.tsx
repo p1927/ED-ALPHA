@@ -1,383 +1,153 @@
-"use client"
-
+import type { Metadata } from "next"
 import Link from "next/link"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { ExternalLink, MousePointerClick, Video } from "lucide-react"
-import { Header } from "@/components/header"
-import { BenchmarkOverview } from "@/components/benchmark-overview"
-import { ControlBar } from "@/components/control-bar"
-import { ExperimentCard } from "@/components/experiment-card"
-import { MetricsChart } from "@/components/metrics-chart"
-import { ResultsTable } from "@/components/results-table"
-import { LoadingState } from "@/components/loading-state"
-import { ErrorState } from "@/components/error-state"
-import { EmptyState } from "@/components/empty-state"
-import { TutorialTour } from "@/components/tutorial-tour"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { getExperimentResults, getRunMetrics, listExperiments } from "@/lib/api"
-import type { Experiment, RunMetric, ResultsResponse } from "@/types/api"
+import { ArrowRight, ExternalLink, MousePointerClick, PlayCircle } from "lucide-react"
 
-const GITHUB_URL = "https://github.com/E9Technologies/ed-alpha"
-const GITHUB_ICON_PATH = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/demo_walkthrough/github.png`
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+const GITHUB_URL = "https://github.com/E9Technologies/ED-ALPHA"
+const VIDEO_SRC = `${BASE_PATH}/videos/ed-alpha-demo-1280x720.mp4`
+const GITHUB_ICON_SRC = `${BASE_PATH}/demo_walkthrough/github.png`
 
-const isAbortError = (error: unknown) => {
-  if (typeof DOMException !== "undefined" && error instanceof DOMException) {
-    return error.name === "AbortError"
-  }
-  return error instanceof Error && error.name === "AbortError"
-}
-
-type DashboardPageProps = {
-  autoOpenTutorial?: boolean
-  forceExpandFirstEvidence?: boolean
-}
-
-export function DashboardPage({ autoOpenTutorial = true, forceExpandFirstEvidence = false }: DashboardPageProps = {}) {
-  const [experiments, setExperiments] = useState<Experiment[]>([])
-  const [selectedExperimentId, setSelectedExperimentId] = useState<number | null>(null)
-  const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
-  const [selectedK, setSelectedK] = useState<number>(25)
-
-  const [metrics, setMetrics] = useState<RunMetric[]>([])
-  const [results, setResults] = useState<ResultsResponse | null>(null)
-
-  const [isLoadingExperiments, setIsLoadingExperiments] = useState(true)
-  const [isLoadingMetrics, setIsLoadingMetrics] = useState(false)
-  const [isLoadingResults, setIsLoadingResults] = useState(false)
-
-  const [experimentsError, setExperimentsError] = useState<string | null>(null)
-  const [metricsError, setMetricsError] = useState<string | null>(null)
-  const [resultsError, setResultsError] = useState<string | null>(null)
-
-  const [metricsReloadKey, setMetricsReloadKey] = useState(0)
-  const [resultsReloadKey, setResultsReloadKey] = useState(0)
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false)
-  const [isTutorialChoiceOpen, setIsTutorialChoiceOpen] = useState(false)
-  const [activeTutorialStep, setActiveTutorialStep] = useState<string | null>(null)
-  const hasAutoOpenedTutorial = useRef(false)
-
-  const selectedExperiment = useMemo(
-    () => experiments.find((exp) => exp.id === selectedExperimentId) ?? null,
-    [experiments, selectedExperimentId],
-  )
-
-  const loadExperiments = useCallback(async () => {
-    setIsLoadingExperiments(true)
-    setExperimentsError(null)
-    try {
-      const data = await listExperiments()
-      setExperiments(data)
-
-      if (data.length === 0) {
-        setSelectedExperimentId(null)
-        setSelectedRunId(null)
-        setMetrics([])
-        setResults(null)
-        return
-      }
-
-      setSelectedExperimentId((currentId) => {
-        const nextId = currentId && data.some((exp) => exp.id === currentId) ? currentId : data[0].id
-        const experiment = data.find((exp) => exp.id === nextId)
-
-        setSelectedRunId((currentRunId) => {
-          if (!experiment || experiment.run_ids.length === 0) {
-            return null
-          }
-
-          if (currentRunId && experiment.run_ids.includes(currentRunId)) {
-            return currentRunId
-          }
-
-          return experiment.run_ids[experiment.run_ids.length - 1] ?? null
-        })
-
-        return nextId
-      })
-    } catch (error) {
-      console.error(error)
-      setExperimentsError("Failed to load experiments. Please retry.")
-    } finally {
-      setIsLoadingExperiments(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void loadExperiments()
-  }, [loadExperiments])
-
-  useEffect(() => {
-    if (!selectedRunId) {
-      setIsLoadingMetrics(false)
-      setMetricsError(null)
-      setMetrics([])
-      return
-    }
-
-    const controller = new AbortController()
-    setIsLoadingMetrics(true)
-    setMetricsError(null)
-
-    getRunMetrics(selectedRunId, { signal: controller.signal })
-      .then((data) => {
-        setMetrics(data)
-      })
-      .catch((error) => {
-        if (isAbortError(error)) {
-          return
-        }
-        console.error(error)
-        setMetricsError("Failed to load metrics.")
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setIsLoadingMetrics(false)
-        }
-      })
-
-    return () => {
-      controller.abort()
-    }
-  }, [selectedRunId, metricsReloadKey])
-
-  useEffect(() => {
-    setResults(null)
-
-    if (!selectedExperimentId || !selectedRunId) {
-      setIsLoadingResults(false)
-      setResultsError(null)
-      return
-    }
-
-    const controller = new AbortController()
-    setIsLoadingResults(true)
-    setResultsError(null)
-
-    getExperimentResults(selectedExperimentId, {
-      runId: selectedRunId,
-      k: selectedK,
-      signal: controller.signal,
-    })
-      .then((data) => {
-        setResults(data)
-      })
-      .catch((error) => {
-        if (isAbortError(error)) {
-          return
-        }
-        console.error(error)
-        setResultsError("Failed to load results.")
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) {
-          setIsLoadingResults(false)
-        }
-      })
-
-    return () => {
-      controller.abort()
-    }
-  }, [selectedExperimentId, selectedRunId, selectedK, resultsReloadKey])
-
-  const handleExperimentChange = (experiment: Experiment) => {
-    setSelectedExperimentId(experiment.id)
-    const nextRun = experiment.run_ids.length > 0 ? experiment.run_ids[experiment.run_ids.length - 1] : null
-    setSelectedRunId(nextRun)
-    setSelectedK(25)
-    setMetrics([])
-    setResults(null)
-    setMetricsError(null)
-    setResultsError(null)
-  }
-
-  const handleRunChange = (runId: number) => {
-    setSelectedRunId(runId)
-    setMetrics([])
-    setResults(null)
-    setMetricsError(null)
-    setResultsError(null)
-    setMetricsReloadKey((value) => value + 1)
-    setResultsReloadKey((value) => value + 1)
-  }
-
-  const handleKChange = (k: number) => {
-    const clamped = Math.max(1, Math.min(1000, k))
-    setSelectedK(clamped)
-    setResults(null)
-    setResultsReloadKey((value) => value + 1)
-  }
-
-  const retryMetrics = () => {
-    if (!selectedRunId) {
-      return
-    }
-    setMetricsReloadKey((value) => value + 1)
-  }
-
-  const retryResults = () => {
-    if (!selectedExperimentId || !selectedRunId) {
-      return
-    }
-    setResultsReloadKey((value) => value + 1)
-  }
-
-  const isDashboardReady = Boolean(
-    !isLoadingExperiments &&
-    !experimentsError &&
-    experiments.length > 0 &&
-    selectedExperiment &&
-    !isLoadingMetrics &&
-    !metricsError &&
-    metrics.length > 0 &&
-    !isLoadingResults &&
-    !resultsError &&
-    results,
-  )
-
-  useEffect(() => {
-    if (!autoOpenTutorial || !isDashboardReady || hasAutoOpenedTutorial.current) {
-      return
-    }
-
-    hasAutoOpenedTutorial.current = true
-    setIsTutorialChoiceOpen(true)
-  }, [autoOpenTutorial, isDashboardReady])
-
-  const openTutorial = () => {
-    setIsTutorialChoiceOpen(true)
-  }
-
-  const startTutorial = () => {
-    setIsTutorialChoiceOpen(false)
-    setIsTutorialOpen(true)
-  }
-
-  const closeTutorial = () => {
-    setIsTutorialOpen(false)
-    setActiveTutorialStep(null)
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <Header onTutorialOpen={openTutorial} />
-      <main className="container mx-auto px-4 py-6 space-y-6" data-tour-id="dashboard-overview">
-        {isLoadingExperiments ? (
-          <LoadingState />
-        ) : experimentsError ? (
-          <ErrorState message={experimentsError} onRetry={() => void loadExperiments()} />
-        ) : experiments.length === 0 ? (
-          <EmptyState message="No experiments available." />
-        ) : (
-          <>
-            <BenchmarkOverview />
-
-            <ControlBar
-              experiments={experiments}
-              selectedExperiment={selectedExperiment}
-              selectedRunId={selectedRunId}
-              onExperimentChange={handleExperimentChange}
-              onRunChange={handleRunChange}
-            />
-
-            {selectedExperiment && <ExperimentCard experiment={selectedExperiment} />}
-
-            {isLoadingMetrics ? (
-              <LoadingState />
-            ) : metricsError ? (
-              <ErrorState message={metricsError} onRetry={retryMetrics} />
-            ) : metrics.length > 0 ? (
-              <MetricsChart metrics={metrics} selectedK={selectedK} onKSelect={handleKChange} />
-            ) : (
-              <EmptyState message="No metrics found for the selected experiment." />
-            )}
-
-            {isLoadingResults ? (
-              <LoadingState />
-            ) : resultsError ? (
-              <ErrorState message={resultsError} onRetry={retryResults} />
-            ) : results ? (
-              <ResultsTable
-                results={results}
-                experiment={selectedExperiment}
-                expandFirstEvidence={
-                  forceExpandFirstEvidence || (isTutorialOpen && activeTutorialStep === "top-k-ranking")
-                }
-              />
-            ) : (
-              <EmptyState message="Select an experiment and run to view results." />
-            )}
-          </>
-        )}
-      </main>
-      <Dialog open={isTutorialChoiceOpen} onOpenChange={setIsTutorialChoiceOpen}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Choose how to explore ED-ALPHA</DialogTitle>
-            <DialogDescription>
-              Start the guided dashboard tutorial, watch the timed demo, or run the benchmark from GitHub.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-3">
-            <Button
-              type="button"
-              size="lg"
-              className="h-auto justify-start whitespace-normal px-4 py-4 text-left"
-              onClick={startTutorial}
-            >
-              <MousePointerClick className="size-5" />
-              <span className="grid gap-1">
-                <span className="font-semibold">Start tutorial</span>
-                <span className="text-xs font-normal opacity-85">Try it with the demo user interface</span>
-              </span>
-            </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="h-auto justify-start whitespace-normal px-4 py-4 text-left"
-            >
-              <Link href="/demo-video">
-                <Video className="size-5" />
-                <span className="grid gap-1">
-                  <span className="font-semibold">See demo video</span>
-                  <span className="text-xs font-normal text-muted-foreground">Watch the timed walkthrough</span>
-                </span>
-              </Link>
-            </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="h-auto justify-start whitespace-normal px-4 py-4 text-left"
-            >
-              <a href={GITHUB_URL} target="_blank" rel="noreferrer">
-                <img src={GITHUB_ICON_PATH} alt="" className="size-5 shrink-0" />
-                <span className="grid gap-1">
-                  <span className="font-semibold">Go to GitHub</span>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    Run ED-ALPHA and submit your run
-                  </span>
-                </span>
-                <ExternalLink className="ml-auto size-4" />
-              </a>
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <TutorialTour open={isTutorialOpen} onClose={closeTutorial} onStepChange={setActiveTutorialStep} />
-    </div>
-  )
+export const metadata: Metadata = {
+  title: "ED-Alpha",
+  description:
+    "An open benchmark for ranking companies by future investment-relevant SEC Form 8-K events using public pre-event information.",
 }
 
 export default function Page() {
-  return <DashboardPage />
+  return (
+    <main className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,oklch(0.995_0_0)_0%,oklch(0.985_0.012_250)_34%,oklch(0.998_0_0)_68%,oklch(0.985_0.018_85)_100%)] text-foreground">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[620px] bg-[linear-gradient(115deg,oklch(0.97_0.018_250_/_0.92)_0%,oklch(1_0_0_/_0.9)_48%,oklch(0.97_0.025_85_/_0.7)_100%)]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-[520px] -z-10 h-56 bg-[linear-gradient(180deg,oklch(1_0_0_/_0)_0%,oklch(1_0_0_/_0.92)_78%)]"
+        aria-hidden="true"
+      />
+      <header className="mx-auto flex w-full max-w-7xl items-center justify-center px-5 py-5 sm:justify-between sm:px-8">
+        <Link href="/" className="flex items-center gap-3" aria-label="ED-Alpha home">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-black text-primary-foreground">
+            ED
+          </span>
+          <span className="text-sm font-semibold text-slate-950">ED-Alpha</span>
+        </Link>
+        <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground sm:flex">
+          <Link href="/tutorial" className="rounded-md px-3 py-2 transition hover:bg-secondary hover:text-foreground">
+            Tutorial
+          </Link>
+          <Link href="/walkthrough" className="rounded-md px-3 py-2 transition hover:bg-secondary hover:text-foreground">
+            Walkthrough
+          </Link>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-md px-3 py-2 transition hover:bg-secondary hover:text-foreground"
+          >
+            GitHub
+          </a>
+        </nav>
+      </header>
+
+      <section className="mx-auto grid w-full max-w-7xl gap-8 px-5 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:pb-20 lg:pt-18">
+        <div className="mx-auto max-w-3xl text-center lg:mx-0 lg:text-left">
+          <h1 className="text-5xl font-black leading-[1.02] text-slate-950 sm:text-6xl lg:text-7xl">
+            ED-Alpha
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-xl font-medium leading-8 text-slate-700 lg:mx-0">
+            ED-Alpha is an open benchmark for predicting future, investment-relevant corporate events.
+          </p>
+        </div>
+
+        <div className="relative -mx-5 sm:mx-0">
+          <div className="overflow-hidden bg-slate-950 shadow-[0_24px_70px_rgba(15,23,42,0.18)] sm:rounded-2xl sm:border sm:border-slate-200 lg:shadow-[0_30px_90px_rgba(15,23,42,0.18)]">
+            <div className="flex items-center justify-between border-b border-white/10 bg-slate-900 px-4 py-2.5 sm:py-3">
+              <div className="flex items-center gap-2" aria-hidden="true">
+                <span className="size-2.5 rounded-full bg-red-400 sm:size-3" />
+                <span className="size-2.5 rounded-full bg-amber-300 sm:size-3" />
+                <span className="size-2.5 rounded-full bg-emerald-400 sm:size-3" />
+              </div>
+              <span className="text-xs font-semibold text-white/60">ED-Alpha walkthrough</span>
+            </div>
+            <video
+              className="block aspect-video w-full bg-slate-950"
+              controls
+              playsInline
+              preload="metadata"
+              aria-label="ED-Alpha demo walkthrough video"
+            >
+              <source src={VIDEO_SRC} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16 lg:pb-20">
+        <div className="mb-5 flex flex-col gap-2 text-center sm:mb-7 sm:flex-row sm:items-end sm:justify-between sm:text-left">
+          <div>
+            <h2 className="text-2xl font-black leading-tight text-slate-950 sm:text-4xl">Explore ED-Alpha</h2>
+          </div>
+        </div>
+        <div className="grid overflow-hidden rounded-2xl border border-border bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] md:grid-cols-3">
+          <Link
+            href="/tutorial"
+            className="group flex items-center justify-between gap-4 border-b border-border p-4 transition hover:bg-secondary/70 sm:p-5 md:min-h-48 md:flex-col md:items-stretch md:p-6 md:border-b-0 md:border-r"
+          >
+            <div className="flex min-w-0 items-center gap-4 md:block">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground md:mb-8 md:size-11">
+                <MousePointerClick className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="hidden text-sm font-semibold uppercase text-muted-foreground md:block">Interactive</div>
+                <h3 className="text-lg font-black text-slate-950 md:mt-2 md:text-2xl">Tutorial</h3>
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-primary md:mt-8">
+              <span className="hidden sm:inline">Open dashboard</span>
+              <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+            </span>
+          </Link>
+          <Link
+            href="/walkthrough"
+            className="group flex items-center justify-between gap-4 border-b border-border p-4 transition hover:bg-secondary/70 sm:p-5 md:min-h-48 md:flex-col md:items-stretch md:p-6 md:border-b-0 md:border-r"
+          >
+            <div className="flex min-w-0 items-center gap-4 md:block">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[oklch(0.55_0.15_85)] text-white md:mb-8 md:size-11">
+                <PlayCircle className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="hidden text-sm font-semibold uppercase text-muted-foreground md:block">Guided</div>
+                <h3 className="text-lg font-black text-slate-950 md:mt-2 md:text-2xl">Walkthrough</h3>
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-primary md:mt-8">
+              <span className="hidden sm:inline">Watch HTML demo</span>
+              <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+            </span>
+          </Link>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-center justify-between gap-4 p-4 transition hover:bg-secondary/70 sm:p-5 md:min-h-48 md:flex-col md:items-stretch md:p-6"
+          >
+            <div className="flex min-w-0 items-center gap-4 md:block">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-950 md:mb-8 md:size-11">
+                <img src={GITHUB_ICON_SRC} alt="" className="size-5 invert" />
+              </div>
+              <div className="min-w-0">
+                <div className="hidden text-sm font-semibold uppercase text-muted-foreground md:block">Source</div>
+                <h3 className="text-lg font-black text-slate-950 md:mt-2 md:text-2xl">GitHub</h3>
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-primary md:mt-8">
+              <span className="hidden sm:inline">View repository</span>
+              <ExternalLink className="size-4 transition group-hover:translate-x-1" />
+            </span>
+          </a>
+        </div>
+      </section>
+    </main>
+  )
 }

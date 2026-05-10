@@ -1,11 +1,13 @@
 # ED-Alpha Static Demo
 
-This directory contains the static ED-Alpha dashboard snapshot used for the hosted demo. It is separate from the live Docker app under `app/`: this demo reads from `data/demo-data.json` and does not require the FastAPI backend or Postgres.
+This directory contains the static ED-Alpha demo site used for GitHub Pages. It is separate from the live Docker app under `app/`: this demo reads from `data/demo-data.json` and does not require the FastAPI backend or Postgres.
 
 ## Routes
 
-- `/` shows the dashboard snapshot with the interactive tutorial tour.
-- `/demo-video/` shows the timed walkthrough with playback controls, subtitles, highlights, and narration.
+- `/` shows the ED-Alpha landing page with the embedded MP4 walkthrough.
+- `/tutorial/` shows the interactive dashboard tutorial.
+- `/walkthrough/` shows the timed HTML walkthrough with playback controls, subtitles, highlights, and narration.
+- `/demo-video/` keeps the same walkthrough available for older links.
 
 ## Local Development
 

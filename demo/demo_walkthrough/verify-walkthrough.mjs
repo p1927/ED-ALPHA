@@ -108,7 +108,7 @@ function timestampLabel(seconds) {
 }
 
 function frameUrl(time) {
-  const url = new URL("/demo-video", baseUrl);
+  const url = new URL("/walkthrough", baseUrl);
   url.searchParams.set("t", String(time));
   url.searchParams.set("paused", "1");
   return url.href;
@@ -268,13 +268,13 @@ async function inspectLayout(page, capture) {
         const popupText = finalPopup.textContent.replace(/\s+/g, " ").trim();
         const popupLink = finalPopup.querySelector("a");
         const popupIcon = finalPopup.querySelector("img");
-        if (!popupText.includes("github.com/E9Technologies/ed-alpha")) {
+        if (!popupText.includes("github.com/E9Technologies/ED-ALPHA")) {
           failures.push("final thank-you popup does not show the GitHub URL");
         }
         if (!popupText.includes("preparing run data")) {
           failures.push("final thank-you popup does not mention preparing run data");
         }
-        if (popupLink?.href !== "https://github.com/E9Technologies/ed-alpha") {
+        if (popupLink?.href !== "https://github.com/E9Technologies/ED-ALPHA") {
           failures.push("final thank-you popup GitHub link is not clickable");
         }
         if (!popupIcon?.src.includes("/demo_walkthrough/github.png")) {
@@ -415,7 +415,7 @@ async function runVerification() {
       results.push({ ...layout, time: capture.time, screenshot });
     }
 
-    await page.goto(`${baseUrl}/demo-video?speed=60`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/walkthrough?speed=60`, { waitUntil: "networkidle" });
     await page.waitForFunction(() => window.__edAlphaDemoState?.paused === true);
     const initialPlaybackState = await page.evaluate(() => ({
       state: window.__edAlphaDemoState,
@@ -442,7 +442,7 @@ async function runVerification() {
 
     const report = {
       generatedAt: new Date().toISOString(),
-      route: `${baseUrl}/demo-video`,
+      route: `${baseUrl}/walkthrough`,
       artifactDir,
       viewport: { width: 1600, height: 900 },
       initialPlaybackState,

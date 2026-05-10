@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { CSSProperties } from "react"
 import { Pause, Play, StepBack, StepForward, Volume2, VolumeX } from "lucide-react"
-import { DashboardPage } from "@/app/page"
+import { DashboardPage } from "@/components/dashboard-page"
 import scriptData from "@/demo_walkthrough/data/scripts.json"
 import alignmentData from "@/public/demo_walkthrough/audio/cover_vocal/alignment.json"
 
@@ -813,7 +813,7 @@ export function DemoVideoPage() {
           >
             <div className="text-4xl font-black leading-tight tracking-normal">Thank you for watching.</div>
             <a
-              href="https://github.com/E9Technologies/ed-alpha"
+              href="https://github.com/E9Technologies/ED-ALPHA"
               target="_blank"
               rel="noreferrer"
               className="flex max-w-4xl items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-7 py-5 text-2xl font-extrabold leading-9 text-slate-950 shadow-inner transition hover:border-sky-300 hover:bg-sky-50"
@@ -822,7 +822,7 @@ export function DemoVideoPage() {
               <span>
                 For running ED-ALPHA and preparing run data, visit{" "}
                 <span className="whitespace-nowrap font-black text-sky-700 underline decoration-sky-300 underline-offset-4">
-                  github.com/E9Technologies/ed-alpha
+                  github.com/E9Technologies/ED-ALPHA
                 </span>
               </span>
             </a>
