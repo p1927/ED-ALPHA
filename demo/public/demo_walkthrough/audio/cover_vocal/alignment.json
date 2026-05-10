@@ -1,0 +1,2748 @@
+{
+  "version": 1,
+  "aligner": "whisper-timestamped",
+  "model": "tiny.en",
+  "source_manifest": "public/demo_walkthrough/audio/cover_vocal/manifest.json",
+  "timestamp_capture": "Word timestamps come from whisper_timestamped.transcribe(...).segments[].words[]. Each raw word start/end is relative to its MP3. Display tokens are reconciled to those raw words by normalized character matching; unmatched tokens are interpolated only when the unmatched count stays under the configured threshold.",
+  "gap_seconds": 0.6,
+  "duration_seconds": 177.249,
+  "cue_count": 29,
+  "cues": [
+    {
+      "index": 1,
+      "scene_id": "intro",
+      "scene_line_index": 1,
+      "text": "ED-ALPHA is an open benchmark for predicting future, investment-relevant corporate events.",
+      "audio_file": "001_intro_01.mp3",
+      "start": 0.0,
+      "end": 5.891,
+      "duration_seconds": 5.891,
+      "words": [
+        {
+          "text": "ED-ALPHA",
+          "start": 0.14,
+          "end": 1.26,
+          "source": "whisper"
+        },
+        {
+          "text": "is",
+          "start": 1.26,
+          "end": 1.48,
+          "source": "whisper"
+        },
+        {
+          "text": "an",
+          "start": 1.48,
+          "end": 1.68,
+          "source": "whisper"
+        },
+        {
+          "text": "open",
+          "start": 1.68,
+          "end": 1.96,
+          "source": "whisper"
+        },
+        {
+          "text": "benchmark",
+          "start": 1.96,
+          "end": 2.38,
+          "source": "whisper"
+        },
+        {
+          "text": "for",
+          "start": 2.38,
+          "end": 2.68,
+          "source": "whisper"
+        },
+        {
+          "text": "predicting",
+          "start": 2.68,
+          "end": 3.14,
+          "source": "whisper"
+        },
+        {
+          "text": "future,",
+          "start": 3.14,
+          "end": 3.7,
+          "source": "whisper"
+        },
+        {
+          "text": "investment-relevant",
+          "start": 3.7,
+          "end": 4.82,
+          "source": "whisper"
+        },
+        {
+          "text": "corporate",
+          "start": 4.82,
+          "end": 5.22,
+          "source": "whisper"
+        },
+        {
+          "text": "events.",
+          "start": 5.22,
+          "end": 5.58,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 11,
+        "raw_whisper_words": 11,
+        "direct_words": 11,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 2,
+      "scene_id": "intro",
+      "scene_line_index": 2,
+      "text": "This walkthrough shows how public news signals are turned into ranked predictions and evaluated against later SEC Form 8-K events.",
+      "audio_file": "002_intro_02.mp3",
+      "start": 6.491,
+      "end": 15.582,
+      "duration_seconds": 9.091,
+      "words": [
+        {
+          "text": "This",
+          "start": 0.14,
+          "end": 0.76,
+          "source": "whisper"
+        },
+        {
+          "text": "walkthrough",
+          "start": 0.76,
+          "end": 1.32,
+          "source": "whisper"
+        },
+        {
+          "text": "shows",
+          "start": 1.32,
+          "end": 1.62,
+          "source": "whisper"
+        },
+        {
+          "text": "how",
+          "start": 1.62,
+          "end": 1.9,
+          "source": "whisper"
+        },
+        {
+          "text": "public",
+          "start": 1.9,
+          "end": 2.3,
+          "source": "whisper"
+        },
+        {
+          "text": "news",
+          "start": 2.3,
+          "end": 2.6,
+          "source": "whisper"
+        },
+        {
+          "text": "signals",
+          "start": 2.6,
+          "end": 2.96,
+          "source": "whisper"
+        },
+        {
+          "text": "are",
+          "start": 2.96,
+          "end": 3.2,
+          "source": "whisper"
+        },
+        {
+          "text": "turned",
+          "start": 3.2,
+          "end": 3.46,
+          "source": "whisper"
+        },
+        {
+          "text": "into",
+          "start": 3.46,
+          "end": 3.76,
+          "source": "whisper"
+        },
+        {
+          "text": "ranked",
+          "start": 3.76,
+          "end": 4.06,
+          "source": "whisper"
+        },
+        {
+          "text": "predictions",
+          "start": 4.06,
+          "end": 4.74,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 4.74,
+          "end": 5.24,
+          "source": "whisper"
+        },
+        {
+          "text": "evaluated",
+          "start": 5.24,
+          "end": 5.9,
+          "source": "whisper"
+        },
+        {
+          "text": "against",
+          "start": 5.9,
+          "end": 6.34,
+          "source": "whisper"
+        },
+        {
+          "text": "later",
+          "start": 6.34,
+          "end": 6.8,
+          "source": "whisper"
+        },
+        {
+          "text": "SEC",
+          "start": 6.8,
+          "end": 7.34,
+          "source": "whisper"
+        },
+        {
+          "text": "Form",
+          "start": 7.34,
+          "end": 7.86,
+          "source": "whisper"
+        },
+        {
+          "text": "8-K",
+          "start": 7.86,
+          "end": 8.4,
+          "source": "whisper"
+        },
+        {
+          "text": "events.",
+          "start": 8.4,
+          "end": 8.72,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 20,
+        "raw_whisper_words": 20,
+        "direct_words": 20,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 3,
+      "scene_id": "background",
+      "scene_line_index": 1,
+      "text": "The task is a forward-looking ranking problem; predict which companies will later file investment-relevant Form 8-K events within the evaluation horizon.",
+      "audio_file": "003_background_01.mp3",
+      "start": 16.182,
+      "end": 25.833,
+      "duration_seconds": 9.651,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.12,
+          "end": 0.42,
+          "source": "whisper"
+        },
+        {
+          "text": "task",
+          "start": 0.42,
+          "end": 0.82,
+          "source": "whisper"
+        },
+        {
+          "text": "is",
+          "start": 0.82,
+          "end": 1.04,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 1.04,
+          "end": 1.24,
+          "source": "whisper"
+        },
+        {
+          "text": "forward-looking",
+          "start": 1.24,
+          "end": 1.9,
+          "source": "whisper"
+        },
+        {
+          "text": "ranking",
+          "start": 1.9,
+          "end": 2.32,
+          "source": "whisper"
+        },
+        {
+          "text": "problem;",
+          "start": 2.32,
+          "end": 2.84,
+          "source": "whisper"
+        },
+        {
+          "text": "predict",
+          "start": 3.08,
+          "end": 3.42,
+          "source": "whisper"
+        },
+        {
+          "text": "which",
+          "start": 3.42,
+          "end": 3.76,
+          "source": "whisper"
+        },
+        {
+          "text": "companies",
+          "start": 3.76,
+          "end": 4.26,
+          "source": "whisper"
+        },
+        {
+          "text": "will",
+          "start": 4.26,
+          "end": 4.5,
+          "source": "whisper"
+        },
+        {
+          "text": "later",
+          "start": 4.5,
+          "end": 4.84,
+          "source": "whisper"
+        },
+        {
+          "text": "file",
+          "start": 4.84,
+          "end": 5.2,
+          "source": "whisper"
+        },
+        {
+          "text": "investment-relevant",
+          "start": 5.2,
+          "end": 6.26,
+          "source": "whisper"
+        },
+        {
+          "text": "Form",
+          "start": 6.26,
+          "end": 6.64,
+          "source": "whisper"
+        },
+        {
+          "text": "8-K",
+          "start": 6.64,
+          "end": 7.22,
+          "source": "whisper"
+        },
+        {
+          "text": "events",
+          "start": 7.22,
+          "end": 7.62,
+          "source": "whisper"
+        },
+        {
+          "text": "within",
+          "start": 7.62,
+          "end": 8.12,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 8.12,
+          "end": 8.3,
+          "source": "whisper"
+        },
+        {
+          "text": "evaluation",
+          "start": 8.3,
+          "end": 8.88,
+          "source": "whisper"
+        },
+        {
+          "text": "horizon.",
+          "start": 8.88,
+          "end": 9.3,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 21,
+        "raw_whisper_words": 21,
+        "direct_words": 21,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 4,
+      "scene_id": "background",
+      "scene_line_index": 2,
+      "text": "At the prediction date, the model can use only information already public, including SEC company metadata and recent news.",
+      "audio_file": "004_background_02.mp3",
+      "start": 26.433,
+      "end": 35.564,
+      "duration_seconds": 9.131,
+      "words": [
+        {
+          "text": "At",
+          "start": 0.24,
+          "end": 0.64,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 0.64,
+          "end": 0.78,
+          "source": "whisper"
+        },
+        {
+          "text": "prediction",
+          "start": 0.78,
+          "end": 1.26,
+          "source": "whisper"
+        },
+        {
+          "text": "date,",
+          "start": 1.26,
+          "end": 1.68,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.9,
+          "end": 1.98,
+          "source": "whisper"
+        },
+        {
+          "text": "model",
+          "start": 1.98,
+          "end": 2.3,
+          "source": "whisper"
+        },
+        {
+          "text": "can",
+          "start": 2.3,
+          "end": 2.52,
+          "source": "whisper"
+        },
+        {
+          "text": "use",
+          "start": 2.52,
+          "end": 2.9,
+          "source": "whisper"
+        },
+        {
+          "text": "only",
+          "start": 2.9,
+          "end": 3.32,
+          "source": "whisper"
+        },
+        {
+          "text": "information",
+          "start": 3.32,
+          "end": 4.0,
+          "source": "whisper"
+        },
+        {
+          "text": "already",
+          "start": 4.0,
+          "end": 4.44,
+          "source": "whisper"
+        },
+        {
+          "text": "public,",
+          "start": 4.44,
+          "end": 5.06,
+          "source": "whisper"
+        },
+        {
+          "text": "including",
+          "start": 5.22,
+          "end": 5.78,
+          "source": "whisper"
+        },
+        {
+          "text": "SEC",
+          "start": 5.78,
+          "end": 6.34,
+          "source": "whisper"
+        },
+        {
+          "text": "company",
+          "start": 6.34,
+          "end": 6.88,
+          "source": "whisper"
+        },
+        {
+          "text": "metadata",
+          "start": 6.88,
+          "end": 7.38,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 7.38,
+          "end": 8.06,
+          "source": "whisper"
+        },
+        {
+          "text": "recent",
+          "start": 8.06,
+          "end": 8.42,
+          "source": "whisper"
+        },
+        {
+          "text": "news.",
+          "start": 8.42,
+          "end": 8.84,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 19,
+        "raw_whisper_words": 19,
+        "direct_words": 19,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 5,
+      "scene_id": "background",
+      "scene_line_index": 3,
+      "text": "Each model ranks companies by how likely they are to file a relevant Form 8-K event.",
+      "audio_file": "005_background_03.mp3",
+      "start": 36.164,
+      "end": 42.175,
+      "duration_seconds": 6.011,
+      "words": [
+        {
+          "text": "Each",
+          "start": 0.14,
+          "end": 0.56,
+          "source": "whisper"
+        },
+        {
+          "text": "model",
+          "start": 0.56,
+          "end": 0.94,
+          "source": "whisper"
+        },
+        {
+          "text": "ranks",
+          "start": 0.94,
+          "end": 1.28,
+          "source": "whisper"
+        },
+        {
+          "text": "companies",
+          "start": 1.28,
+          "end": 1.8,
+          "source": "whisper"
+        },
+        {
+          "text": "by",
+          "start": 1.8,
+          "end": 2.18,
+          "source": "whisper"
+        },
+        {
+          "text": "how",
+          "start": 2.18,
+          "end": 2.38,
+          "source": "whisper"
+        },
+        {
+          "text": "likely",
+          "start": 2.38,
+          "end": 2.78,
+          "source": "whisper"
+        },
+        {
+          "text": "they",
+          "start": 2.78,
+          "end": 3.0,
+          "source": "whisper"
+        },
+        {
+          "text": "are",
+          "start": 3.0,
+          "end": 3.16,
+          "source": "whisper"
+        },
+        {
+          "text": "to",
+          "start": 3.16,
+          "end": 3.34,
+          "source": "whisper"
+        },
+        {
+          "text": "file",
+          "start": 3.34,
+          "end": 3.72,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 3.72,
+          "end": 3.96,
+          "source": "whisper"
+        },
+        {
+          "text": "relevant",
+          "start": 3.96,
+          "end": 4.44,
+          "source": "whisper"
+        },
+        {
+          "text": "Form",
+          "start": 4.44,
+          "end": 4.8,
+          "source": "whisper"
+        },
+        {
+          "text": "8-K",
+          "start": 4.8,
+          "end": 5.36,
+          "source": "whisper"
+        },
+        {
+          "text": "event.",
+          "start": 5.36,
+          "end": 5.64,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 16,
+        "raw_whisper_words": 16,
+        "direct_words": 16,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 6,
+      "scene_id": "background",
+      "scene_line_index": 4,
+      "text": "Ground-truth labels come from SEC Form 8-K filings in the evaluation horizon, meaning the future window the model is trying to predict.",
+      "audio_file": "006_background_04.mp3",
+      "start": 42.775,
+      "end": 51.306,
+      "duration_seconds": 8.531,
+      "words": [
+        {
+          "text": "Ground-truth",
+          "start": 0.16,
+          "end": 0.96,
+          "source": "whisper"
+        },
+        {
+          "text": "labels",
+          "start": 0.96,
+          "end": 1.42,
+          "source": "whisper"
+        },
+        {
+          "text": "come",
+          "start": 1.42,
+          "end": 1.7,
+          "source": "whisper"
+        },
+        {
+          "text": "from",
+          "start": 1.7,
+          "end": 1.96,
+          "source": "whisper"
+        },
+        {
+          "text": "SEC",
+          "start": 1.96,
+          "end": 2.48,
+          "source": "whisper"
+        },
+        {
+          "text": "Form",
+          "start": 2.48,
+          "end": 2.86,
+          "source": "whisper"
+        },
+        {
+          "text": "8-K",
+          "start": 2.86,
+          "end": 3.38,
+          "source": "whisper"
+        },
+        {
+          "text": "filings",
+          "start": 3.38,
+          "end": 3.78,
+          "source": "whisper"
+        },
+        {
+          "text": "in",
+          "start": 3.78,
+          "end": 4.04,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 4.04,
+          "end": 4.12,
+          "source": "whisper"
+        },
+        {
+          "text": "evaluation",
+          "start": 4.12,
+          "end": 4.72,
+          "source": "whisper"
+        },
+        {
+          "text": "horizon,",
+          "start": 4.72,
+          "end": 5.2,
+          "source": "whisper"
+        },
+        {
+          "text": "meaning",
+          "start": 5.58,
+          "end": 5.88,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 5.88,
+          "end": 6.06,
+          "source": "whisper"
+        },
+        {
+          "text": "future",
+          "start": 6.06,
+          "end": 6.42,
+          "source": "whisper"
+        },
+        {
+          "text": "window",
+          "start": 6.42,
+          "end": 6.76,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 6.76,
+          "end": 6.96,
+          "source": "whisper"
+        },
+        {
+          "text": "model",
+          "start": 6.96,
+          "end": 7.28,
+          "source": "whisper"
+        },
+        {
+          "text": "is",
+          "start": 7.28,
+          "end": 7.46,
+          "source": "whisper"
+        },
+        {
+          "text": "trying",
+          "start": 7.46,
+          "end": 7.76,
+          "source": "whisper"
+        },
+        {
+          "text": "to",
+          "start": 7.76,
+          "end": 7.96,
+          "source": "whisper"
+        },
+        {
+          "text": "predict.",
+          "start": 7.96,
+          "end": 8.24,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 22,
+        "raw_whisper_words": 22,
+        "direct_words": 22,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 7,
+      "scene_id": "workflow",
+      "scene_line_index": 1,
+      "text": "Finally, the dashboard evaluates the Top-K ranking with precision, recall, F1, and true-positive counts.",
+      "audio_file": "007_workflow_01.mp3",
+      "start": 51.906,
+      "end": 59.837,
+      "duration_seconds": 7.931,
+      "words": [
+        {
+          "text": "Finally,",
+          "start": 0.22,
+          "end": 0.92,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.26,
+          "end": 1.4,
+          "source": "whisper"
+        },
+        {
+          "text": "dashboard",
+          "start": 1.4,
+          "end": 1.94,
+          "source": "whisper"
+        },
+        {
+          "text": "evaluates",
+          "start": 1.94,
+          "end": 2.6,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 2.6,
+          "end": 2.82,
+          "source": "whisper"
+        },
+        {
+          "text": "Top-K",
+          "start": 2.82,
+          "end": 3.36,
+          "source": "whisper"
+        },
+        {
+          "text": "ranking",
+          "start": 3.36,
+          "end": 3.76,
+          "source": "whisper"
+        },
+        {
+          "text": "with",
+          "start": 3.76,
+          "end": 3.96,
+          "source": "whisper"
+        },
+        {
+          "text": "precision,",
+          "start": 3.96,
+          "end": 4.64,
+          "source": "whisper"
+        },
+        {
+          "text": "recall,",
+          "start": 4.88,
+          "end": 5.34,
+          "source": "whisper"
+        },
+        {
+          "text": "F1,",
+          "start": 5.62,
+          "end": 6.28,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 6.4,
+          "end": 6.62,
+          "source": "whisper"
+        },
+        {
+          "text": "true-positive",
+          "start": 6.62,
+          "end": 7.26,
+          "source": "whisper"
+        },
+        {
+          "text": "counts.",
+          "start": 7.26,
+          "end": 7.64,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 14,
+        "raw_whisper_words": 14,
+        "direct_words": 14,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 8,
+      "scene_id": "controls",
+      "scene_line_index": 1,
+      "text": "Start with the controls.",
+      "audio_file": "008_controls_01.mp3",
+      "start": 60.437,
+      "end": 62.248,
+      "duration_seconds": 1.811,
+      "words": [
+        {
+          "text": "Start",
+          "start": 0.16,
+          "end": 0.66,
+          "source": "whisper"
+        },
+        {
+          "text": "with",
+          "start": 0.66,
+          "end": 0.86,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 0.86,
+          "end": 1.08,
+          "source": "whisper"
+        },
+        {
+          "text": "controls.",
+          "start": 1.08,
+          "end": 1.46,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 4,
+        "raw_whisper_words": 4,
+        "direct_words": 4,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 9,
+      "scene_id": "controls",
+      "scene_line_index": 2,
+      "text": "The experiment selector fixes the benchmark scenario.",
+      "audio_file": "009_controls_02.mp3",
+      "start": 62.848,
+      "end": 66.299,
+      "duration_seconds": 3.451,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.1,
+          "end": 0.5,
+          "source": "whisper"
+        },
+        {
+          "text": "experiment",
+          "start": 0.5,
+          "end": 1.1,
+          "source": "whisper"
+        },
+        {
+          "text": "selector",
+          "start": 1.1,
+          "end": 1.68,
+          "source": "whisper"
+        },
+        {
+          "text": "fixes",
+          "start": 1.68,
+          "end": 2.12,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 2.12,
+          "end": 2.38,
+          "source": "whisper"
+        },
+        {
+          "text": "benchmark",
+          "start": 2.38,
+          "end": 2.74,
+          "source": "whisper"
+        },
+        {
+          "text": "scenario.",
+          "start": 2.74,
+          "end": 3.18,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 7,
+        "raw_whisper_words": 7,
+        "direct_words": 7,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 10,
+      "scene_id": "controls",
+      "scene_line_index": 3,
+      "text": "Here, Experiment 20 defines the prediction date, horizon, sampling seed, and tracked event types.",
+      "audio_file": "010_controls_03.mp3",
+      "start": 66.899,
+      "end": 74.15,
+      "duration_seconds": 7.251,
+      "words": [
+        {
+          "text": "Here,",
+          "start": 0.16,
+          "end": 0.8,
+          "source": "whisper"
+        },
+        {
+          "text": "Experiment",
+          "start": 1.02,
+          "end": 1.52,
+          "source": "whisper"
+        },
+        {
+          "text": "20",
+          "start": 1.52,
+          "end": 1.98,
+          "source": "whisper"
+        },
+        {
+          "text": "defines",
+          "start": 1.98,
+          "end": 2.44,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 2.44,
+          "end": 2.66,
+          "source": "whisper"
+        },
+        {
+          "text": "prediction",
+          "start": 2.66,
+          "end": 3.1,
+          "source": "whisper"
+        },
+        {
+          "text": "date,",
+          "start": 3.1,
+          "end": 3.5,
+          "source": "whisper"
+        },
+        {
+          "text": "horizon,",
+          "start": 3.78,
+          "end": 4.24,
+          "source": "whisper"
+        },
+        {
+          "text": "sampling",
+          "start": 4.56,
+          "end": 5.04,
+          "source": "whisper"
+        },
+        {
+          "text": "seed,",
+          "start": 5.04,
+          "end": 5.54,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 5.8,
+          "end": 5.94,
+          "source": "whisper"
+        },
+        {
+          "text": "tracked",
+          "start": 5.94,
+          "end": 6.2,
+          "source": "whisper"
+        },
+        {
+          "text": "event",
+          "start": 6.2,
+          "end": 6.48,
+          "source": "whisper"
+        },
+        {
+          "text": "types.",
+          "start": 6.48,
+          "end": 6.82,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 14,
+        "raw_whisper_words": 14,
+        "direct_words": 14,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 11,
+      "scene_id": "controls",
+      "scene_line_index": 4,
+      "text": "The run selector chooses one scoring execution inside that same fixed task.",
+      "audio_file": "011_controls_04.mp3",
+      "start": 74.75,
+      "end": 79.841,
+      "duration_seconds": 5.091,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.14,
+          "end": 0.5,
+          "source": "whisper"
+        },
+        {
+          "text": "run",
+          "start": 0.5,
+          "end": 0.78,
+          "source": "whisper"
+        },
+        {
+          "text": "selector",
+          "start": 0.78,
+          "end": 1.26,
+          "source": "whisper"
+        },
+        {
+          "text": "chooses",
+          "start": 1.26,
+          "end": 1.7,
+          "source": "whisper"
+        },
+        {
+          "text": "one",
+          "start": 1.7,
+          "end": 2.1,
+          "source": "whisper"
+        },
+        {
+          "text": "scoring",
+          "start": 2.1,
+          "end": 2.46,
+          "source": "whisper"
+        },
+        {
+          "text": "execution",
+          "start": 2.46,
+          "end": 3.1,
+          "source": "whisper"
+        },
+        {
+          "text": "inside",
+          "start": 3.1,
+          "end": 3.54,
+          "source": "whisper"
+        },
+        {
+          "text": "that",
+          "start": 3.54,
+          "end": 3.8,
+          "source": "whisper"
+        },
+        {
+          "text": "same",
+          "start": 3.8,
+          "end": 4.14,
+          "source": "whisper"
+        },
+        {
+          "text": "fixed",
+          "start": 4.14,
+          "end": 4.44,
+          "source": "whisper"
+        },
+        {
+          "text": "task.",
+          "start": 4.44,
+          "end": 4.88,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 12,
+        "raw_whisper_words": 12,
+        "direct_words": 12,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 12,
+      "scene_id": "controls",
+      "scene_line_index": 5,
+      "text": "That lets a reviewer compare different models without changing the benchmark setup.",
+      "audio_file": "012_controls_05.mp3",
+      "start": 80.441,
+      "end": 85.332,
+      "duration_seconds": 4.891,
+      "words": [
+        {
+          "text": "That",
+          "start": 0.14,
+          "end": 0.56,
+          "source": "whisper"
+        },
+        {
+          "text": "lets",
+          "start": 0.56,
+          "end": 0.84,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 0.84,
+          "end": 1.02,
+          "source": "whisper"
+        },
+        {
+          "text": "reviewer",
+          "start": 1.02,
+          "end": 1.32,
+          "source": "whisper"
+        },
+        {
+          "text": "compare",
+          "start": 1.32,
+          "end": 1.82,
+          "source": "whisper"
+        },
+        {
+          "text": "different",
+          "start": 1.82,
+          "end": 2.26,
+          "source": "whisper"
+        },
+        {
+          "text": "models",
+          "start": 2.26,
+          "end": 2.72,
+          "source": "whisper"
+        },
+        {
+          "text": "without",
+          "start": 2.72,
+          "end": 3.22,
+          "source": "whisper"
+        },
+        {
+          "text": "changing",
+          "start": 3.22,
+          "end": 3.64,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 3.64,
+          "end": 3.74,
+          "source": "whisper"
+        },
+        {
+          "text": "benchmark",
+          "start": 3.74,
+          "end": 4.18,
+          "source": "whisper"
+        },
+        {
+          "text": "setup.",
+          "start": 4.18,
+          "end": 4.54,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 12,
+        "raw_whisper_words": 12,
+        "direct_words": 12,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 13,
+      "scene_id": "config",
+      "scene_line_index": 1,
+      "text": "Next, read the experiment configuration.",
+      "audio_file": "013_config_01.mp3",
+      "start": 85.932,
+      "end": 88.943,
+      "duration_seconds": 3.011,
+      "words": [
+        {
+          "text": "Next,",
+          "start": 0.2,
+          "end": 0.92,
+          "source": "whisper"
+        },
+        {
+          "text": "read",
+          "start": 0.98,
+          "end": 1.26,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.26,
+          "end": 1.52,
+          "source": "whisper"
+        },
+        {
+          "text": "experiment",
+          "start": 1.52,
+          "end": 1.98,
+          "source": "whisper"
+        },
+        {
+          "text": "configuration.",
+          "start": 1.98,
+          "end": 2.6,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 5,
+        "raw_whisper_words": 5,
+        "direct_words": 5,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 14,
+      "scene_id": "config",
+      "scene_line_index": 2,
+      "text": "The prediction date is August 31, 2025, and the event horizon is five days.",
+      "audio_file": "014_config_02.mp3",
+      "start": 89.543,
+      "end": 96.154,
+      "duration_seconds": 6.611,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.12,
+          "end": 0.38,
+          "source": "whisper"
+        },
+        {
+          "text": "prediction",
+          "start": 0.38,
+          "end": 0.88,
+          "source": "whisper"
+        },
+        {
+          "text": "date",
+          "start": 0.88,
+          "end": 1.22,
+          "source": "whisper"
+        },
+        {
+          "text": "is",
+          "start": 1.22,
+          "end": 1.48,
+          "source": "whisper"
+        },
+        {
+          "text": "August",
+          "start": 1.48,
+          "end": 1.8,
+          "source": "whisper"
+        },
+        {
+          "text": "31,",
+          "start": 1.8,
+          "end": 2.26,
+          "source": "whisper"
+        },
+        {
+          "text": "2025,",
+          "start": 2.74,
+          "end": 3.28,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 3.92,
+          "end": 4.14,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 4.14,
+          "end": 4.34,
+          "source": "whisper"
+        },
+        {
+          "text": "event",
+          "start": 4.34,
+          "end": 4.64,
+          "source": "whisper"
+        },
+        {
+          "text": "horizon",
+          "start": 4.64,
+          "end": 5.1,
+          "source": "whisper"
+        },
+        {
+          "text": "is",
+          "start": 5.1,
+          "end": 5.5,
+          "source": "whisper"
+        },
+        {
+          "text": "five",
+          "start": 5.5,
+          "end": 5.86,
+          "source": "whisper"
+        },
+        {
+          "text": "days.",
+          "start": 5.86,
+          "end": 6.24,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 14,
+        "raw_whisper_words": 14,
+        "direct_words": 14,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 15,
+      "scene_id": "config",
+      "scene_line_index": 3,
+      "text": "The seed and negative multiplier make the snapshot reproducible.",
+      "audio_file": "015_config_03.mp3",
+      "start": 96.754,
+      "end": 100.885,
+      "duration_seconds": 4.131,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.2,
+          "end": 0.54,
+          "source": "whisper"
+        },
+        {
+          "text": "seed",
+          "start": 0.54,
+          "end": 0.9,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 0.9,
+          "end": 1.08,
+          "source": "whisper"
+        },
+        {
+          "text": "negative",
+          "start": 1.08,
+          "end": 1.42,
+          "source": "whisper"
+        },
+        {
+          "text": "multiplier",
+          "start": 1.42,
+          "end": 2.0,
+          "source": "whisper"
+        },
+        {
+          "text": "make",
+          "start": 2.0,
+          "end": 2.4,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 2.4,
+          "end": 2.6,
+          "source": "whisper"
+        },
+        {
+          "text": "snapshot",
+          "start": 2.6,
+          "end": 3.1,
+          "source": "whisper"
+        },
+        {
+          "text": "reproducible.",
+          "start": 3.1,
+          "end": 3.84,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 9,
+        "raw_whisper_words": 9,
+        "direct_words": 9,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 16,
+      "scene_id": "config",
+      "scene_line_index": 4,
+      "text": "The item-code list states which Form 8-K events count as positives.",
+      "audio_file": "016_config_04.mp3",
+      "start": 101.485,
+      "end": 106.256,
+      "duration_seconds": 4.771,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.1,
+          "end": 0.46,
+          "source": "whisper"
+        },
+        {
+          "text": "item-code",
+          "start": 0.46,
+          "end": 1.1,
+          "source": "whisper"
+        },
+        {
+          "text": "list",
+          "start": 1.1,
+          "end": 1.44,
+          "source": "whisper"
+        },
+        {
+          "text": "states",
+          "start": 1.44,
+          "end": 1.84,
+          "source": "whisper"
+        },
+        {
+          "text": "which",
+          "start": 1.84,
+          "end": 2.2,
+          "source": "whisper"
+        },
+        {
+          "text": "Form",
+          "start": 2.2,
+          "end": 2.5,
+          "source": "whisper"
+        },
+        {
+          "text": "8-K",
+          "start": 2.5,
+          "end": 3.0,
+          "source": "whisper"
+        },
+        {
+          "text": "events",
+          "start": 3.0,
+          "end": 3.46,
+          "source": "whisper"
+        },
+        {
+          "text": "count",
+          "start": 3.46,
+          "end": 3.78,
+          "source": "whisper"
+        },
+        {
+          "text": "as",
+          "start": 3.78,
+          "end": 3.94,
+          "source": "whisper"
+        },
+        {
+          "text": "positives.",
+          "start": 3.94,
+          "end": 4.44,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 11,
+        "raw_whisper_words": 11,
+        "direct_words": 11,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 17,
+      "scene_id": "config",
+      "scene_line_index": 5,
+      "text": "These details are what make a dashboard result traceable back to a fixed benchmark definition.",
+      "audio_file": "017_config_05.mp3",
+      "start": 106.856,
+      "end": 112.267,
+      "duration_seconds": 5.411,
+      "words": [
+        {
+          "text": "These",
+          "start": 0.08,
+          "end": 0.54,
+          "source": "whisper"
+        },
+        {
+          "text": "details",
+          "start": 0.54,
+          "end": 1.1,
+          "source": "whisper"
+        },
+        {
+          "text": "are",
+          "start": 1.1,
+          "end": 1.34,
+          "source": "whisper"
+        },
+        {
+          "text": "what",
+          "start": 1.34,
+          "end": 1.5,
+          "source": "whisper"
+        },
+        {
+          "text": "make",
+          "start": 1.5,
+          "end": 1.76,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 1.76,
+          "end": 1.9,
+          "source": "whisper"
+        },
+        {
+          "text": "dashboard",
+          "start": 1.9,
+          "end": 2.3,
+          "source": "whisper"
+        },
+        {
+          "text": "result",
+          "start": 2.3,
+          "end": 2.72,
+          "source": "whisper"
+        },
+        {
+          "text": "traceable",
+          "start": 2.72,
+          "end": 3.32,
+          "source": "whisper"
+        },
+        {
+          "text": "back",
+          "start": 3.32,
+          "end": 3.64,
+          "source": "whisper"
+        },
+        {
+          "text": "to",
+          "start": 3.64,
+          "end": 3.78,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 3.78,
+          "end": 3.98,
+          "source": "whisper"
+        },
+        {
+          "text": "fixed",
+          "start": 3.98,
+          "end": 4.22,
+          "source": "whisper"
+        },
+        {
+          "text": "benchmark",
+          "start": 4.22,
+          "end": 4.66,
+          "source": "whisper"
+        },
+        {
+          "text": "definition.",
+          "start": 4.66,
+          "end": 5.18,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 15,
+        "raw_whisper_words": 15,
+        "direct_words": 15,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 18,
+      "scene_id": "metrics",
+      "scene_line_index": 1,
+      "text": "The metrics panel shows how ranking quality changes with K.",
+      "audio_file": "018_metrics_01.mp3",
+      "start": 112.867,
+      "end": 116.598,
+      "duration_seconds": 3.731,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.14,
+          "end": 0.42,
+          "source": "whisper"
+        },
+        {
+          "text": "metrics",
+          "start": 0.42,
+          "end": 0.88,
+          "source": "whisper"
+        },
+        {
+          "text": "panel",
+          "start": 0.88,
+          "end": 1.3,
+          "source": "whisper"
+        },
+        {
+          "text": "shows",
+          "start": 1.3,
+          "end": 1.64,
+          "source": "whisper"
+        },
+        {
+          "text": "how",
+          "start": 1.64,
+          "end": 1.84,
+          "source": "whisper"
+        },
+        {
+          "text": "ranking",
+          "start": 1.84,
+          "end": 2.18,
+          "source": "whisper"
+        },
+        {
+          "text": "quality",
+          "start": 2.18,
+          "end": 2.62,
+          "source": "whisper"
+        },
+        {
+          "text": "changes",
+          "start": 2.62,
+          "end": 3.02,
+          "source": "whisper"
+        },
+        {
+          "text": "with",
+          "start": 3.02,
+          "end": 3.26,
+          "source": "whisper"
+        },
+        {
+          "text": "K.",
+          "start": 3.26,
+          "end": 3.731,
+          "source": "interpolated"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 10,
+        "raw_whisper_words": 10,
+        "direct_words": 9,
+        "interpolated_words": 1
+      }
+    },
+    {
+      "index": 19,
+      "scene_id": "metrics",
+      "scene_line_index": 2,
+      "text": "Precision tells us how many selected companies are correct.",
+      "audio_file": "019_metrics_02.mp3",
+      "start": 117.198,
+      "end": 120.849,
+      "duration_seconds": 3.651,
+      "words": [
+        {
+          "text": "Precision",
+          "start": 0.14,
+          "end": 0.76,
+          "source": "whisper"
+        },
+        {
+          "text": "tells",
+          "start": 0.76,
+          "end": 1.16,
+          "source": "whisper"
+        },
+        {
+          "text": "us",
+          "start": 1.16,
+          "end": 1.42,
+          "source": "whisper"
+        },
+        {
+          "text": "how",
+          "start": 1.42,
+          "end": 1.58,
+          "source": "whisper"
+        },
+        {
+          "text": "many",
+          "start": 1.58,
+          "end": 1.8,
+          "source": "whisper"
+        },
+        {
+          "text": "selected",
+          "start": 1.8,
+          "end": 2.26,
+          "source": "whisper"
+        },
+        {
+          "text": "companies",
+          "start": 2.26,
+          "end": 2.78,
+          "source": "whisper"
+        },
+        {
+          "text": "are",
+          "start": 2.78,
+          "end": 3.1,
+          "source": "whisper"
+        },
+        {
+          "text": "correct.",
+          "start": 3.1,
+          "end": 3.42,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 9,
+        "raw_whisper_words": 9,
+        "direct_words": 9,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 20,
+      "scene_id": "metrics",
+      "scene_line_index": 3,
+      "text": "Recall tells us how much of the future event set has been recovered.",
+      "audio_file": "020_metrics_03.mp3",
+      "start": 121.449,
+      "end": 125.58,
+      "duration_seconds": 4.131,
+      "words": [
+        {
+          "text": "Recall",
+          "start": 0.18,
+          "end": 0.72,
+          "source": "whisper"
+        },
+        {
+          "text": "tells",
+          "start": 0.72,
+          "end": 1.1,
+          "source": "whisper"
+        },
+        {
+          "text": "us",
+          "start": 1.1,
+          "end": 1.38,
+          "source": "whisper"
+        },
+        {
+          "text": "how",
+          "start": 1.38,
+          "end": 1.64,
+          "source": "whisper"
+        },
+        {
+          "text": "much",
+          "start": 1.64,
+          "end": 1.94,
+          "source": "whisper"
+        },
+        {
+          "text": "of",
+          "start": 1.94,
+          "end": 2.08,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 2.08,
+          "end": 2.12,
+          "source": "whisper"
+        },
+        {
+          "text": "future",
+          "start": 2.12,
+          "end": 2.52,
+          "source": "whisper"
+        },
+        {
+          "text": "event",
+          "start": 2.52,
+          "end": 2.86,
+          "source": "whisper"
+        },
+        {
+          "text": "set",
+          "start": 2.86,
+          "end": 3.12,
+          "source": "whisper"
+        },
+        {
+          "text": "has",
+          "start": 3.12,
+          "end": 3.38,
+          "source": "whisper"
+        },
+        {
+          "text": "been",
+          "start": 3.38,
+          "end": 3.56,
+          "source": "whisper"
+        },
+        {
+          "text": "recovered.",
+          "start": 3.56,
+          "end": 3.88,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 13,
+        "raw_whisper_words": 13,
+        "direct_words": 13,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 21,
+      "scene_id": "metrics",
+      "scene_line_index": 4,
+      "text": "F1 summarizes that balance, while true positives gives the concrete count.",
+      "audio_file": "021_metrics_04.mp3",
+      "start": 126.18,
+      "end": 131.271,
+      "duration_seconds": 5.091,
+      "words": [
+        {
+          "text": "F1",
+          "start": 0.22,
+          "end": 0.92,
+          "source": "whisper"
+        },
+        {
+          "text": "summarizes",
+          "start": 0.92,
+          "end": 1.4,
+          "source": "whisper"
+        },
+        {
+          "text": "that",
+          "start": 1.4,
+          "end": 1.7,
+          "source": "whisper"
+        },
+        {
+          "text": "balance,",
+          "start": 1.7,
+          "end": 2.16,
+          "source": "whisper"
+        },
+        {
+          "text": "while",
+          "start": 2.48,
+          "end": 2.68,
+          "source": "whisper"
+        },
+        {
+          "text": "true",
+          "start": 2.68,
+          "end": 2.94,
+          "source": "whisper"
+        },
+        {
+          "text": "positives",
+          "start": 2.94,
+          "end": 3.5,
+          "source": "whisper"
+        },
+        {
+          "text": "gives",
+          "start": 3.5,
+          "end": 3.8,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 3.8,
+          "end": 4.02,
+          "source": "whisper"
+        },
+        {
+          "text": "concrete",
+          "start": 4.02,
+          "end": 4.5,
+          "source": "whisper"
+        },
+        {
+          "text": "count.",
+          "start": 4.5,
+          "end": 4.9,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 11,
+        "raw_whisper_words": 11,
+        "direct_words": 11,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 22,
+      "scene_id": "table",
+      "scene_line_index": 1,
+      "text": "The table turns the metric summary into concrete ranked companies.",
+      "audio_file": "022_table_01.mp3",
+      "start": 131.871,
+      "end": 136.402,
+      "duration_seconds": 4.531,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.18,
+          "end": 0.48,
+          "source": "whisper"
+        },
+        {
+          "text": "table",
+          "start": 0.48,
+          "end": 0.92,
+          "source": "whisper"
+        },
+        {
+          "text": "turns",
+          "start": 0.92,
+          "end": 1.32,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.32,
+          "end": 1.56,
+          "source": "whisper"
+        },
+        {
+          "text": "metric",
+          "start": 1.56,
+          "end": 1.88,
+          "source": "whisper"
+        },
+        {
+          "text": "summary",
+          "start": 1.88,
+          "end": 2.32,
+          "source": "whisper"
+        },
+        {
+          "text": "into",
+          "start": 2.32,
+          "end": 2.64,
+          "source": "whisper"
+        },
+        {
+          "text": "concrete",
+          "start": 2.64,
+          "end": 3.28,
+          "source": "whisper"
+        },
+        {
+          "text": "ranked",
+          "start": 3.28,
+          "end": 3.62,
+          "source": "whisper"
+        },
+        {
+          "text": "companies.",
+          "start": 3.62,
+          "end": 4.06,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 10,
+        "raw_whisper_words": 10,
+        "direct_words": 10,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 23,
+      "scene_id": "table",
+      "scene_line_index": 2,
+      "text": "Each row shows the company, model score, supporting news signal, outcome, and matched event.",
+      "audio_file": "023_table_02.mp3",
+      "start": 137.002,
+      "end": 142.733,
+      "duration_seconds": 5.731,
+      "words": [
+        {
+          "text": "Each",
+          "start": 0.0,
+          "end": 0.42,
+          "source": "whisper"
+        },
+        {
+          "text": "row",
+          "start": 0.42,
+          "end": 0.74,
+          "source": "whisper"
+        },
+        {
+          "text": "shows",
+          "start": 0.74,
+          "end": 1.02,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.02,
+          "end": 1.26,
+          "source": "whisper"
+        },
+        {
+          "text": "company,",
+          "start": 1.26,
+          "end": 1.74,
+          "source": "whisper"
+        },
+        {
+          "text": "model",
+          "start": 1.82,
+          "end": 2.18,
+          "source": "whisper"
+        },
+        {
+          "text": "score,",
+          "start": 2.18,
+          "end": 2.6,
+          "source": "whisper"
+        },
+        {
+          "text": "supporting",
+          "start": 2.78,
+          "end": 3.12,
+          "source": "whisper"
+        },
+        {
+          "text": "news",
+          "start": 3.12,
+          "end": 3.42,
+          "source": "whisper"
+        },
+        {
+          "text": "signal,",
+          "start": 3.42,
+          "end": 3.9,
+          "source": "whisper"
+        },
+        {
+          "text": "outcome,",
+          "start": 4.04,
+          "end": 4.4,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 4.72,
+          "end": 4.86,
+          "source": "whisper"
+        },
+        {
+          "text": "matched",
+          "start": 4.86,
+          "end": 5.2,
+          "source": "whisper"
+        },
+        {
+          "text": "event.",
+          "start": 5.2,
+          "end": 5.54,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 14,
+        "raw_whisper_words": 14,
+        "direct_words": 14,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 24,
+      "scene_id": "table",
+      "scene_line_index": 3,
+      "text": "A hit means the ranked company later filed a tracked event during the evaluation window.",
+      "audio_file": "024_table_03.mp3",
+      "start": 143.333,
+      "end": 149.304,
+      "duration_seconds": 5.971,
+      "words": [
+        {
+          "text": "A",
+          "start": 0.16,
+          "end": 0.52,
+          "source": "whisper"
+        },
+        {
+          "text": "hit",
+          "start": 0.52,
+          "end": 0.74,
+          "source": "whisper"
+        },
+        {
+          "text": "means",
+          "start": 0.74,
+          "end": 1.18,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.18,
+          "end": 1.46,
+          "source": "whisper"
+        },
+        {
+          "text": "ranked",
+          "start": 1.46,
+          "end": 1.8,
+          "source": "whisper"
+        },
+        {
+          "text": "company",
+          "start": 1.8,
+          "end": 2.38,
+          "source": "whisper"
+        },
+        {
+          "text": "later",
+          "start": 2.38,
+          "end": 2.76,
+          "source": "whisper"
+        },
+        {
+          "text": "filed",
+          "start": 2.76,
+          "end": 3.16,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 3.16,
+          "end": 3.4,
+          "source": "whisper"
+        },
+        {
+          "text": "tracked",
+          "start": 3.4,
+          "end": 3.72,
+          "source": "whisper"
+        },
+        {
+          "text": "event",
+          "start": 3.72,
+          "end": 4.16,
+          "source": "whisper"
+        },
+        {
+          "text": "during",
+          "start": 4.16,
+          "end": 4.52,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 4.52,
+          "end": 4.7,
+          "source": "whisper"
+        },
+        {
+          "text": "evaluation",
+          "start": 4.7,
+          "end": 5.32,
+          "source": "whisper"
+        },
+        {
+          "text": "window.",
+          "start": 5.32,
+          "end": 5.64,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 15,
+        "raw_whisper_words": 15,
+        "direct_words": 15,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 25,
+      "scene_id": "evidence",
+      "scene_line_index": 1,
+      "text": "The news summary explains why the model ranked this company before the event window.",
+      "audio_file": "025_evidence_01.mp3",
+      "start": 149.904,
+      "end": 155.155,
+      "duration_seconds": 5.251,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.12,
+          "end": 0.5,
+          "source": "whisper"
+        },
+        {
+          "text": "news",
+          "start": 0.5,
+          "end": 0.86,
+          "source": "whisper"
+        },
+        {
+          "text": "summary",
+          "start": 0.86,
+          "end": 1.2,
+          "source": "whisper"
+        },
+        {
+          "text": "explains",
+          "start": 1.2,
+          "end": 1.82,
+          "source": "whisper"
+        },
+        {
+          "text": "why",
+          "start": 1.82,
+          "end": 2.16,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 2.16,
+          "end": 2.26,
+          "source": "whisper"
+        },
+        {
+          "text": "model",
+          "start": 2.26,
+          "end": 2.6,
+          "source": "whisper"
+        },
+        {
+          "text": "ranked",
+          "start": 2.6,
+          "end": 2.92,
+          "source": "whisper"
+        },
+        {
+          "text": "this",
+          "start": 2.92,
+          "end": 3.22,
+          "source": "whisper"
+        },
+        {
+          "text": "company",
+          "start": 3.22,
+          "end": 3.7,
+          "source": "whisper"
+        },
+        {
+          "text": "before",
+          "start": 3.7,
+          "end": 4.24,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 4.24,
+          "end": 4.46,
+          "source": "whisper"
+        },
+        {
+          "text": "event",
+          "start": 4.46,
+          "end": 4.72,
+          "source": "whisper"
+        },
+        {
+          "text": "window.",
+          "start": 4.72,
+          "end": 4.98,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 14,
+        "raw_whisper_words": 14,
+        "direct_words": 14,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 26,
+      "scene_id": "evidence",
+      "scene_line_index": 2,
+      "text": "The event column shows the later Form 8-K match.",
+      "audio_file": "026_evidence_02.mp3",
+      "start": 155.755,
+      "end": 159.286,
+      "duration_seconds": 3.531,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.1,
+          "end": 0.46,
+          "source": "whisper"
+        },
+        {
+          "text": "event",
+          "start": 0.46,
+          "end": 0.8,
+          "source": "whisper"
+        },
+        {
+          "text": "column",
+          "start": 0.8,
+          "end": 1.2,
+          "source": "whisper"
+        },
+        {
+          "text": "shows",
+          "start": 1.2,
+          "end": 1.5,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.5,
+          "end": 1.72,
+          "source": "whisper"
+        },
+        {
+          "text": "later",
+          "start": 1.72,
+          "end": 2.14,
+          "source": "whisper"
+        },
+        {
+          "text": "Form",
+          "start": 2.14,
+          "end": 2.48,
+          "source": "whisper"
+        },
+        {
+          "text": "8-K",
+          "start": 2.48,
+          "end": 3.0,
+          "source": "whisper"
+        },
+        {
+          "text": "match.",
+          "start": 3.0,
+          "end": 3.38,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 9,
+        "raw_whisper_words": 9,
+        "direct_words": 9,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 27,
+      "scene_id": "end",
+      "scene_line_index": 1,
+      "text": "The final step is export.",
+      "audio_file": "027_end_01.mp3",
+      "start": 159.886,
+      "end": 162.017,
+      "duration_seconds": 2.131,
+      "words": [
+        {
+          "text": "The",
+          "start": 0.1,
+          "end": 0.44,
+          "source": "whisper"
+        },
+        {
+          "text": "final",
+          "start": 0.44,
+          "end": 0.88,
+          "source": "whisper"
+        },
+        {
+          "text": "step",
+          "start": 0.88,
+          "end": 1.24,
+          "source": "whisper"
+        },
+        {
+          "text": "is",
+          "start": 1.24,
+          "end": 1.6,
+          "source": "whisper"
+        },
+        {
+          "text": "export.",
+          "start": 1.6,
+          "end": 1.96,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 5,
+        "raw_whisper_words": 5,
+        "direct_words": 5,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 28,
+      "scene_id": "end",
+      "scene_line_index": 2,
+      "text": "Researchers can keep the selected experiment and ranking results as a JSON snapshot.",
+      "audio_file": "028_end_02.mp3",
+      "start": 162.617,
+      "end": 167.868,
+      "duration_seconds": 5.251,
+      "words": [
+        {
+          "text": "Researchers",
+          "start": 0.08,
+          "end": 0.76,
+          "source": "whisper"
+        },
+        {
+          "text": "can",
+          "start": 0.76,
+          "end": 1.14,
+          "source": "whisper"
+        },
+        {
+          "text": "keep",
+          "start": 1.14,
+          "end": 1.4,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 1.4,
+          "end": 1.58,
+          "source": "whisper"
+        },
+        {
+          "text": "selected",
+          "start": 1.58,
+          "end": 1.96,
+          "source": "whisper"
+        },
+        {
+          "text": "experiment",
+          "start": 1.96,
+          "end": 2.6,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 2.6,
+          "end": 2.88,
+          "source": "whisper"
+        },
+        {
+          "text": "ranking",
+          "start": 2.88,
+          "end": 3.16,
+          "source": "whisper"
+        },
+        {
+          "text": "results",
+          "start": 3.16,
+          "end": 3.66,
+          "source": "whisper"
+        },
+        {
+          "text": "as",
+          "start": 3.66,
+          "end": 3.92,
+          "source": "whisper"
+        },
+        {
+          "text": "a",
+          "start": 3.92,
+          "end": 4.08,
+          "source": "whisper"
+        },
+        {
+          "text": "JSON",
+          "start": 4.08,
+          "end": 4.42,
+          "source": "whisper"
+        },
+        {
+          "text": "snapshot.",
+          "start": 4.42,
+          "end": 4.9,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 13,
+        "raw_whisper_words": 13,
+        "direct_words": 13,
+        "interpolated_words": 0
+      }
+    },
+    {
+      "index": 29,
+      "scene_id": "end",
+      "scene_line_index": 3,
+      "text": "Thank you for watching. For details on running ED-ALPHA and preparing run data, please visit the ED-ALPHA GitHub repository page.",
+      "audio_file": "029_end_03.mp3",
+      "start": 168.468,
+      "end": 177.249,
+      "duration_seconds": 8.781,
+      "words": [
+        {
+          "text": "Thank",
+          "start": 0.14,
+          "end": 0.56,
+          "source": "whisper"
+        },
+        {
+          "text": "you",
+          "start": 0.56,
+          "end": 0.74,
+          "source": "whisper"
+        },
+        {
+          "text": "for",
+          "start": 0.74,
+          "end": 0.84,
+          "source": "whisper"
+        },
+        {
+          "text": "watching.",
+          "start": 0.84,
+          "end": 1.36,
+          "source": "whisper"
+        },
+        {
+          "text": "For",
+          "start": 1.64,
+          "end": 1.84,
+          "source": "whisper"
+        },
+        {
+          "text": "details",
+          "start": 1.84,
+          "end": 2.3,
+          "source": "whisper"
+        },
+        {
+          "text": "on",
+          "start": 2.3,
+          "end": 2.52,
+          "source": "whisper"
+        },
+        {
+          "text": "running",
+          "start": 2.52,
+          "end": 2.84,
+          "source": "whisper"
+        },
+        {
+          "text": "ED-ALPHA",
+          "start": 2.84,
+          "end": 3.7,
+          "source": "whisper"
+        },
+        {
+          "text": "and",
+          "start": 3.7,
+          "end": 3.82,
+          "source": "whisper"
+        },
+        {
+          "text": "preparing",
+          "start": 3.82,
+          "end": 4.26,
+          "source": "whisper"
+        },
+        {
+          "text": "run",
+          "start": 4.26,
+          "end": 4.52,
+          "source": "whisper"
+        },
+        {
+          "text": "data,",
+          "start": 4.52,
+          "end": 4.86,
+          "source": "whisper"
+        },
+        {
+          "text": "please",
+          "start": 5.16,
+          "end": 5.4,
+          "source": "whisper"
+        },
+        {
+          "text": "visit",
+          "start": 5.4,
+          "end": 5.7,
+          "source": "whisper"
+        },
+        {
+          "text": "the",
+          "start": 5.7,
+          "end": 6.02,
+          "source": "whisper"
+        },
+        {
+          "text": "ED-ALPHA",
+          "start": 6.02,
+          "end": 6.74,
+          "source": "whisper"
+        },
+        {
+          "text": "GitHub",
+          "start": 6.74,
+          "end": 7.0,
+          "source": "whisper"
+        },
+        {
+          "text": "repository",
+          "start": 7.0,
+          "end": 7.62,
+          "source": "whisper"
+        },
+        {
+          "text": "page.",
+          "start": 7.62,
+          "end": 8.08,
+          "source": "whisper"
+        }
+      ],
+      "alignment_stats": {
+        "expected_words": 20,
+        "raw_whisper_words": 20,
+        "direct_words": 20,
+        "interpolated_words": 0
+      }
+    }
+  ]
+}

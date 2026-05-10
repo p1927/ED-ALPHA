@@ -6,5 +6,6 @@
 **/.turbo
 **/dist
 **/build
+demo/
 **/.DS_Store
 .dockerignore

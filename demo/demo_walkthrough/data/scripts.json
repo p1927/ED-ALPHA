@@ -1,0 +1,128 @@
+{
+  "scenes": [
+    {
+      "id": "intro",
+      "start": 0,
+      "end": 15,
+      "targetId": "product-identity",
+      "title": "ED-ALPHA",
+      "bubble": "This is the actual ED-ALPHA dashboard UI with a timed tutorial layer on top.",
+      "subtitles": [
+        "ED-ALPHA is an open benchmark for predicting future, investment-relevant corporate events.",
+        "This walkthrough shows how public news signals are turned into ranked predictions and evaluated against later SEC Form 8-K events."
+      ]
+    },
+    {
+      "id": "background",
+      "start": 15,
+      "end": 40,
+      "targetId": "benchmark-overview",
+      "title": "Benchmark background",
+      "bubble": "The task uses public pre-event information and evaluates predictions against later SEC Form 8-K filings.",
+      "subtitles": [
+        "The task is a forward-looking ranking problem; predict which companies will later file investment-relevant Form 8-K events within the evaluation horizon.",
+        "At the prediction date, the model can use only information already public, including SEC company metadata and recent news.",
+        "Each model ranks companies by how likely they are to file a relevant Form 8-K event.",
+        "Ground-truth labels come from SEC Form 8-K filings in the evaluation horizon, meaning the future window the model is trying to predict."
+      ]
+    },
+    {
+      "id": "workflow",
+      "start": 40,
+      "end": 65,
+      "targetId": "benchmark-overview",
+      "title": "Workflow",
+      "bubble": "Users read the objective, inputs, ground truth, evaluation metrics, and expected submission shape.",
+      "subtitles": [
+        "Finally, the dashboard evaluates the Top-K ranking with precision, recall, F1, and true-positive counts."
+      ]
+    },
+    {
+      "id": "controls",
+      "start": 65,
+      "end": 90,
+      "targetId": "experiment-controls",
+      "title": "Choose the benchmark run",
+      "bubble": "Experiment 20 fixes the task. Run 54 is one model or scoring execution inside that task.",
+      "subtitles": [
+        "Start with the controls.",
+        "The experiment selector fixes the benchmark scenario.",
+        "Here, Experiment 20 defines the prediction date, horizon, sampling seed, and tracked event types.",
+        "The run selector chooses one scoring execution inside that same fixed task.",
+        "That lets a reviewer compare different models without changing the benchmark setup."
+      ]
+    },
+    {
+      "id": "config",
+      "start": 90,
+      "end": 120,
+      "targetId": "experiment-config",
+      "title": "Reproducible setup",
+      "bubble": "The card records prediction date, event horizon, seed, negative multiplier, and tracked 8-K item codes.",
+      "subtitles": [
+        "Next, read the experiment configuration.",
+        "The prediction date is August 31, 2025, and the event horizon is five days.",
+        "The seed and negative multiplier make the snapshot reproducible.",
+        "The item-code list states which Form 8-K events count as positives.",
+        "These details are what make a dashboard result traceable back to a fixed benchmark definition."
+      ]
+    },
+    {
+      "id": "metrics",
+      "start": 120,
+      "end": 145,
+      "targetId": "selected-k-summary",
+      "title": "Inspect Top-K quality",
+      "bubble": "The selected operating point summarizes Precision@K, Recall@K, F1@K, and true positives.",
+      "subtitles": [
+        "The metrics panel shows how ranking quality changes with K.",
+        "Precision tells us how many selected companies are correct.",
+        "Recall tells us how much of the future event set has been recovered.",
+        "F1 summarizes that balance, while true positives gives the concrete count."
+      ],
+      "scrollBlock": "center"
+    },
+    {
+      "id": "table",
+      "start": 145,
+      "end": 162,
+      "targetId": "top-k-first-row",
+      "title": "Read ranked companies",
+      "bubble": "Each row shows the company, score, news signals, hit or miss outcome, and matched event metadata.",
+      "subtitles": [
+        "The table turns the metric summary into concrete ranked companies.",
+        "Each row shows the company, model score, supporting news signal, outcome, and matched event.",
+        "A hit means the ranked company later filed a tracked event during the evaluation window."
+      ],
+      "scrollBlock": "center"
+    },
+    {
+      "id": "evidence",
+      "start": 162,
+      "end": 170,
+      "targetId": "top-k-evidence",
+      "title": "Audit a prediction",
+      "bubble": "For a hit, compare the model-side news signal with the later Form 8-K event in the same row.",
+      "subtitles": [
+        "The news summary explains why the model ranked this company before the event window.",
+        "The event column shows the later Form 8-K match."
+      ],
+      "scrollBlock": "center"
+    },
+    {
+      "id": "end",
+      "start": 170,
+      "end": 180,
+      "targetId": "export-json",
+      "title": "Complete loop",
+      "bubble": "The JSON export preserves the selected experiment and ranking results for review.",
+      "subtitles": [
+        "The final step is export.",
+        "Researchers can keep the selected experiment and ranking results as a JSON snapshot.",
+        "Thank you for watching. For details on running ED-ALPHA and preparing run data, please visit the ED-ALPHA GitHub repository page."
+      ],
+      "scrollBlock": "center",
+      "bubblePlacement": "below"
+    }
+  ]
+}

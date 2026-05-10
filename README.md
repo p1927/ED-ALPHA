@@ -156,3 +156,4 @@ Tip: use `config/predict_config.example.json` as a template and pass `--config` 
 
 - [Data model and pipeline flow](docs/data-model-and-flow.md)
 - [How to evaluate your model](docs/how-to-evaluate-your-model.md)
+- [Static demo and GitHub Pages setup](demo/README.md)
