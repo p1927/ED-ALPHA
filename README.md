@@ -6,20 +6,16 @@
   <img src="docs/images/app.gif" alt="ED-Alpha app" width="760" />
 </p>
 
+<p align="center">
+  <a href="https://e9technologies.github.io/ED-ALPHA/"><img src="https://img.shields.io/badge/Demo-Website-2f4858?style=flat-square&logo=githubpages&logoColor=white" alt="Demo website" /></a>
+  <a href="https://e9technologies.github.io/ED-ALPHA/tutorial/"><img src="https://img.shields.io/badge/Demo-Tutorial-0b6bcb?style=flat-square&logo=readthedocs&logoColor=white" alt="Tutorial" /></a>
+  <a href="https://e9technologies.github.io/ED-ALPHA/walkthrough/"><img src="https://img.shields.io/badge/Demo-Walkthrough-b31b1b?style=flat-square&logo=arxiv&logoColor=white" alt="Walkthrough" /></a>
+</p>
+
 ## What is ED-Alpha?
 
 - **ED-Alpha is an open benchmark for predicting future, investment-relevant corporate events.** At a fixed prediction date, a model uses only public information already available, such as company metadata and recent news, to rank companies by how likely they are to later file relevant SEC Form 8-K events.
 - The ED-Alpha dashboard shows the ranked predictions, supporting news signals, matched filing outcomes, and Top-K evaluation metrics for reviewing model performance in one place.
-
-## Overview
-
-- Pipeline steps: (1) sync SEC company data and filings to build labels, (2) ingest GDELT GKG news and link them to companies, (3) score article importance with an LLM, (4) aggregate run-level scores to extract likely events and measure metrics.
-- Tech stack: Python 3.12.11, PostgreSQL, OpenAI Chat Completions API, FastAPI app backend, Next.js/PNPM frontend.
-
-<p align="center">
-  <img src="docs/images/platform.png" alt="Platform architecture" width="240" />
-</p>
-
 ## Quickstart
 
 Run the full stack with Docker Compose v2 (`docker compose …`): Postgres + backend (FastAPI) + frontend (Next.js) + batch runner.
@@ -154,6 +150,9 @@ Tip: use `config/predict_config.example.json` as a template and pass `--config` 
 
 ## Additional Documentation
 
+- [Public demo website](https://e9technologies.github.io/ED-ALPHA/)
+- [Interactive dashboard tutorial](https://e9technologies.github.io/ED-ALPHA/tutorial/)
+- [Timed walkthrough](https://e9technologies.github.io/ED-ALPHA/walkthrough/)
 - [Data model and pipeline flow](docs/data-model-and-flow.md)
 - [How to evaluate your model](docs/how-to-evaluate-your-model.md)
 - [Static demo and GitHub Pages setup](demo/README.md)
