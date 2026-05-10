@@ -10,7 +10,7 @@ const GITHUB_ICON_SRC = `${BASE_PATH}/demo_walkthrough/github.png`
 export const metadata: Metadata = {
   title: "ED-Alpha",
   description:
-    "An open benchmark for ranking companies by future investment-relevant SEC Form 8-K events using public pre-event information.",
+    "Event-Driven ALPHA (ED-Alpha) is an open benchmark for ranking companies by future investment-relevant SEC Form 8-K events using public pre-event information.",
 }
 
 export default function Page() {
@@ -55,7 +55,7 @@ export default function Page() {
             ED-Alpha
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-xl font-medium leading-8 text-slate-700 lg:mx-0">
-            ED-Alpha is an open benchmark for predicting future, investment-relevant corporate events.
+            Event-Driven ALPHA (ED-Alpha) is an open benchmark for predicting future, investment-relevant corporate events.
           </p>
         </div>
 
