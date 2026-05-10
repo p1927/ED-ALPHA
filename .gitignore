@@ -195,6 +195,9 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# Playwright MCP browser snapshots and logs
+.playwright-mcp/
+
 # PyPI configuration file
 .pypirc
 

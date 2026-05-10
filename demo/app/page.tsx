@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight, ExternalLink, MousePointerClick, PlayCircle } from "lucide-react"
+import { Activity, ArrowRight, ExternalLink, MousePointerClick, PlayCircle } from "lucide-react"
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
 const GITHUB_URL = "https://github.com/E9Technologies/ED-ALPHA"
@@ -26,10 +26,10 @@ export default function Page() {
       />
       <header className="mx-auto flex w-full max-w-7xl items-center justify-center px-5 py-5 sm:justify-between sm:px-8">
         <Link href="/" className="flex items-center gap-3" aria-label="ED-Alpha home">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-black text-primary-foreground">
-            ED
+          <span className="flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/60">
+            <Activity className="size-6 text-primary-foreground" />
           </span>
-          <span className="text-sm font-semibold text-slate-950">ED-Alpha</span>
+          <span className="text-sm font-semibold text-slate-950">ED-ALPHA</span>
         </Link>
         <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground sm:flex">
           <Link href="/tutorial" className="rounded-md px-3 py-2 transition hover:bg-secondary hover:text-foreground">
