@@ -9,7 +9,6 @@
 <p align="center">
   <a href="https://e9technologies.github.io/ED-ALPHA/"><img src="https://img.shields.io/badge/Demo-Website-2f4858?style=flat-square&logo=githubpages&logoColor=white" alt="Demo website" /></a>
   <a href="https://e9technologies.github.io/ED-ALPHA/tutorial/"><img src="https://img.shields.io/badge/Demo-Tutorial-0b6bcb?style=flat-square&logo=readthedocs&logoColor=white" alt="Tutorial" /></a>
-  <a href="https://e9technologies.github.io/ED-ALPHA/walkthrough/"><img src="https://img.shields.io/badge/Demo-Walkthrough-b31b1b?style=flat-square&logo=arxiv&logoColor=white" alt="Walkthrough" /></a>
 </p>
 
 ## What is ED-Alpha?
