@@ -37,7 +37,7 @@ export function Header({ apiBase }: HeaderProps) {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">ED-ALPHA</h1>
-            <p className="text-xs text-muted-foreground font-mono">Event Driven Strategy Analytics Platform</p>
+            <p className="text-xs text-muted-foreground font-mono">Open Event Prediction Benchmark</p>
           </div>
         </div>
         {healthError && (

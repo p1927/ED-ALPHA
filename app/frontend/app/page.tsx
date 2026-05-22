@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Header } from "@/components/header"
+import { BenchmarkOverview } from "@/components/benchmark-overview"
 import { ControlBar } from "@/components/control-bar"
 import { ExperimentCard } from "@/components/experiment-card"
 import { MetricsChart } from "@/components/metrics-chart"
@@ -23,7 +24,7 @@ export default function Page() {
   const [experiments, setExperiments] = useState<Experiment[]>([])
   const [selectedExperimentId, setSelectedExperimentId] = useState<number | null>(null)
   const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
-  const [selectedK, setSelectedK] = useState<number>(50)
+  const [selectedK, setSelectedK] = useState<number>(25)
 
   const [metrics, setMetrics] = useState<RunMetric[]>([])
   const [results, setResults] = useState<ResultsResponse | null>(null)
@@ -166,7 +167,7 @@ export default function Page() {
     setSelectedExperimentId(experiment.id)
     const nextRun = experiment.run_ids.length > 0 ? experiment.run_ids[experiment.run_ids.length - 1] : null
     setSelectedRunId(nextRun)
-    setSelectedK(50)
+    setSelectedK(25)
     setMetrics([])
     setResults(null)
     setMetricsError(null)
@@ -216,6 +217,8 @@ export default function Page() {
               <EmptyState message="No experiments available." />
         ) : (
           <>
+            <BenchmarkOverview />
+
             <ControlBar
               experiments={experiments}
               selectedExperiment={selectedExperiment}

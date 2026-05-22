@@ -22,7 +22,7 @@ export function ControlBar({
   return (
     <div className="metric-card rounded-xl p-6 shadow-lg">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="w-fit max-w-full space-y-2">
           <Label htmlFor="experiment-select" className="text-sm font-semibold text-foreground">
             Experiment
           </Label>
@@ -54,7 +54,7 @@ export function ControlBar({
           </Select>
         </div>
 
-        <div className="space-y-2">
+        <div className="w-fit max-w-full space-y-2">
           <Label htmlFor="run-select" className="text-sm font-semibold text-foreground">
             Run
           </Label>

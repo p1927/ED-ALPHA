@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, ChevronUp, Download, ExternalLink } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { CheckCircle2, ChevronDown, ChevronUp, Download, ExternalLink, XCircle } from "lucide-react"
 import type { EventItems, Experiment, ResultsResponse } from "@/types/api"
 
 interface ResultsTableProps {
@@ -74,25 +75,37 @@ export function ResultsTable({ results, experiment }: ResultsTableProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-4 font-medium text-muted-foreground">CIK</th>
-                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Company Name</th>
+                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Rank</th>
+                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Company</th>
                 <th className="text-right py-3 px-4 font-medium text-muted-foreground">Score</th>
-                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Evidence</th>
+                <th className="text-left py-3 px-4 font-medium text-muted-foreground">News Signals</th>
+                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Outcome</th>
                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">Event</th>
                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">Link</th>
               </tr>
             </thead>
             <tbody>
-              {results.results.map((row) => {
+              {results.results.map((row, rowIndex) => {
                 const isExpanded = expandedRows.has(row.cik)
                 const firstEvidence = row.evidence[0]
                 const hasMoreEvidence = row.evidence.length > 1
                 const eventItems = normalizeEventItems(row.event?.items)
+                const isHit = Boolean(row.event)
 
                 return (
                   <tr key={row.cik} className="border-b border-border hover:bg-secondary/50">
-                    <td className="py-3 px-4 font-mono">{row.cik}</td>
-                    <td className="py-3 px-4">{row.company_name || "—"}</td>
+                    <td className="py-3 px-4 font-mono font-semibold">#{rowIndex + 1}</td>
+                    <td className="py-3 px-4">
+                      <div className="max-w-[15rem] space-y-1">
+                        <div className="font-medium leading-snug text-foreground">{row.company_name || "N/A"}</div>
+                        <div
+                          className="font-mono text-[0.72rem] leading-none text-muted-foreground"
+                          title="SEC Central Index Key"
+                        >
+                          {row.cik}
+                        </div>
+                      </div>
+                    </td>
                     <td className="py-3 px-4 text-right font-mono font-semibold">{Math.round(row.total_score)}</td>
                     <td className="py-3 px-4">
                       {firstEvidence ? (
@@ -153,7 +166,28 @@ export function ResultsTable({ results, experiment }: ResultsTableProps) {
                           )}
                         </div>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {isHit ? (
+                        <Badge
+                          variant="outline"
+                          className="border-emerald-200 bg-emerald-50 text-emerald-700"
+                          title="Hit: the ranked company matched a tracked 8-K event in the evaluation window."
+                        >
+                          <CheckCircle2 className="text-emerald-600" />
+                          Hit
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="border-rose-200 bg-rose-50 text-rose-700"
+                          title="Miss: no tracked 8-K event was found for this ranked company in the evaluation window."
+                        >
+                          <XCircle className="text-rose-600" />
+                          Miss
+                        </Badge>
                       )}
                     </td>
                     <td className="py-3 px-4">
@@ -164,7 +198,7 @@ export function ResultsTable({ results, experiment }: ResultsTableProps) {
                             <ul className="space-y-1 text-muted-foreground">
                               {eventItems.map((item, idx) => (
                                 <li key={idx} className="flex gap-2">
-                                  <span className="font-mono text-[0.65rem] text-muted-foreground/80">•</span>
+                                  <span className="font-mono text-[0.65rem] text-muted-foreground/80">*</span>
                                   <span>{item}</span>
                                 </li>
                               ))}
@@ -177,7 +211,7 @@ export function ResultsTable({ results, experiment }: ResultsTableProps) {
                           )}
                         </div>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground">N/A</span>
                       )}
                     </td>
                     <td className="py-3 px-4">
@@ -191,7 +225,7 @@ export function ResultsTable({ results, experiment }: ResultsTableProps) {
                           <ExternalLink className="w-4 h-4" />
                         </a>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground">N/A</span>
                       )}
                     </td>
                   </tr>

@@ -8,15 +8,14 @@ import {
   LinearScale,
   PointElement,
   LineElement,
-  Title,
   Tooltip,
-  Legend,
   type Plugin,
   type ChartOptions,
+  type ChartData,
 } from "chart.js"
 import { Scatter } from "react-chartjs-2"
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip)
 
 function computeF1(precision: number, recall: number) {
   if (precision + recall === 0) return 0
@@ -157,15 +156,22 @@ export function MetricsChart({ metrics, selectedK, onKSelect }: MetricsChartProp
   }))
 
   const selectedMetric = enhancedMetrics[selectedIndex] ?? enhancedMetrics[0] ?? null
+  const selectedMetricRows = [
+    ["K", selectedMetric ? selectedMetric.k : "-"],
+    ["Precision@K", selectedMetric ? formatPercent(selectedMetric.precision) : "-"],
+    ["Recall@K", selectedMetric ? formatPercent(selectedMetric.recall) : "-"],
+    ["F1@K", selectedMetric ? formatPercent(selectedMetric.f1) : "-"],
+    ["TP@K", selectedMetric ? selectedMetric.truePositives : "-"],
+  ]
 
-  const data = {
+  const data: ChartData<"scatter", ScatterPoint[]> = {
     datasets: [
       {
         label: "PR@K",
         type: "scatter" as const,
         data: scatterPoints,
         showLine: false,
-        parsing: false,
+        parsing: false as const,
         pointBackgroundColor: enhancedMetrics.map((metric, i) =>
           i === bestIndex
             ? BEST_F1_COLOR
@@ -205,25 +211,7 @@ export function MetricsChart({ metrics, selectedK, onKSelect }: MetricsChartProp
     },
     plugins: {
       legend: {
-        position: "top",
-        labels: {
-          color: "rgb(39, 39, 42)",
-          font: {
-            size: 12,
-          },
-          usePointStyle: true,
-          boxWidth: 14,
-          pointStyle: "circle",
-          generateLabels: (chart) => {
-            const labels = ChartJS.defaults.plugins.legend.labels.generateLabels(chart)
-            return labels.map((label) => ({
-              ...label,
-              fillStyle: BEST_F1_COLOR,
-              strokeStyle: BEST_F1_COLOR,
-              borderWidth: 2,
-            }))
-          },
-        },
+        display: false,
       },
       tooltip: {
         displayColors: false,
@@ -297,53 +285,37 @@ export function MetricsChart({ metrics, selectedK, onKSelect }: MetricsChartProp
         <CardTitle className="text-xl">Metrics (Recall@K / Precision@K / F1@K / TP@K )</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6 lg:justify-between">
-          <div className="w-full lg:max-w-[720px] lg:flex-none mx-auto">
-            <div className="w-full aspect-[4/3]">
+        <div className="flex flex-col items-start gap-4 lg:flex-row">
+          <div className="min-w-0 flex-1">
+            <div className="h-[420px] w-full">
               <Scatter data={data} options={options} plugins={[f1ContourPlugin]} />
             </div>
           </div>
-          <div className="w-full lg:w-[260px] lg:flex-none mx-auto lg:ml-0">
-            <table className="w-full text-sm border border-border rounded-lg overflow-hidden">
-              <thead className="bg-muted/60 text-left uppercase tracking-wide text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2">Metric</th>
-                  <th className="px-3 py-2 text-right">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-t">
-                  <td className="px-3 py-2 text-muted-foreground">K</td>
-                  <td className="px-3 py-2 text-right font-semibold">
-                    {selectedMetric ? selectedMetric.k : "-"}
-                  </td>
-                </tr>
-                <tr className="border-t">
-                  <td className="px-3 py-2 text-muted-foreground">Precision@K</td>
-                  <td className="px-3 py-2 text-right">
-                    {selectedMetric ? formatPercent(selectedMetric.precision) : "-"}
-                  </td>
-                </tr>
-                <tr className="border-t">
-                  <td className="px-3 py-2 text-muted-foreground">Recall@K</td>
-                  <td className="px-3 py-2 text-right">
-                    {selectedMetric ? formatPercent(selectedMetric.recall) : "-"}
-                  </td>
-                </tr>
-                <tr className="border-t">
-                  <td className="px-3 py-2 text-muted-foreground">F1@K</td>
-                  <td className="px-3 py-2 text-right">
-                    {selectedMetric ? formatPercent(selectedMetric.f1) : "-"}
-                  </td>
-                </tr>
-                <tr className="border-t">
-                  <td className="px-3 py-2 text-muted-foreground">TP@K</td>
-                  <td className="px-3 py-2 text-right">
-                    {selectedMetric ? selectedMetric.truePositives : "-"}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="w-full shrink-0 lg:w-[clamp(170px,25vw,240px)]">
+            <div className="overflow-hidden rounded-lg border border-border">
+              <table className="w-full table-fixed text-xs">
+                <colgroup>
+                  <col />
+                  <col className="w-[4.25rem]" />
+                </colgroup>
+                <thead className="bg-muted/60 text-left uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-2.5 py-2 font-semibold">Metric</th>
+                    <th className="px-2.5 py-2 text-right font-semibold">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedMetricRows.map(([label, value], index) => (
+                    <tr key={label} className="border-t border-border">
+                      <td className="truncate px-2.5 py-2 text-muted-foreground">{label}</td>
+                      <td className={`px-2.5 py-2 text-right tabular-nums ${index === 0 ? "font-semibold" : ""}`}>
+                        {value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
         <p className="text-sm text-muted-foreground mt-4 text-center">
