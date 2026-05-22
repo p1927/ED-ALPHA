@@ -201,7 +201,17 @@ class OpenRouterArticleScorer(BaseArticleScorer):
             data=json.dumps(payload),
             timeout=self.request_timeout,
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            detail = ""
+            try:
+                body_text = response.text
+                if body_text:
+                    detail = f" Response body: {body_text}"
+            except Exception:
+                pass
+            raise requests.HTTPError(f"OpenRouter request failed: {exc}.{detail}") from exc
 
         content = _extract_content_from_body(response.json())
         return _parse_json_payload(content)

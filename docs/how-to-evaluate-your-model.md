@@ -72,6 +72,7 @@ The scorer constructor should not require arguments.
 ## 2. Make your scorer importable
 
 When running inside the batch container, make sure both ED-Alpha's `src` directory and your scorer module are on `PYTHONPATH`.
+Mount your scorer directory into the container, or extend `batch/Dockerfile` to `COPY` it into the image.
 
 For example, if your code is available at `/app/my_model/scorer.py`:
 
