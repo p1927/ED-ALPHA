@@ -207,7 +207,7 @@ def upsert_article(
     with connection.cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO gdelt_articles2 (article_url, title, snippet, last_fetched_at, fetch_error)
+            INSERT INTO gdelt_articles (article_url, title, snippet, last_fetched_at, fetch_error)
             VALUES (%s, %s, %s, NOW(), %s)
             ON CONFLICT (article_url)
             DO UPDATE SET
@@ -229,7 +229,7 @@ def get_article_content(
 ) -> Tuple[str, str]:
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT title, snippet, fetch_error FROM gdelt_articles2 WHERE article_url = %s",
+            "SELECT title, snippet, fetch_error FROM gdelt_articles WHERE article_url = %s",
             (article_url,),
         )
         row = cursor.fetchone()
