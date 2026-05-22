@@ -1,17 +1,15 @@
 # How to evaluate your model
 
-Use this guide to connect your own event-scoring model to ED-Alpha and evaluate it with the existing recall/precision workflow.
+Use this guide to connect your own article-level event scorer to ED-Alpha and evaluate it with the existing aggregation and recall/precision workflow.
 
-## 1. Match the expected scorer format
-
-ED-Alpha scores one news article at a time. Your wrapper must accept:
+ED-Alpha v1 standardizes custom models as article scorers:
 
 ```python
 title: str | None
 snippet: str | None
 ```
 
-Your wrapper must return:
+Each scorer must return:
 
 ```python
 ScoreResult(score=<1_to_5>, reason=<non_empty_text>)
@@ -25,17 +23,19 @@ Use this score scale:
 4. `4`: strong event signal.
 5. `5`: clear or explicit event signal.
 
-## 2. Add a wrapper class
+After article scoring, ED-Alpha reuses the existing company-level aggregation and Top-K evaluation scripts.
 
-Add this class in `batch/src/llm_methods.py` below `OpenRouterChatMethod`.
+## 1. Create a scorer class
+
+Create a Python module outside or inside the repository, for example `my_model/scorer.py`.
+Subclassing `BaseArticleScorer` is recommended for readability, but ED-Alpha only requires an object with a callable `score(title, snippet)` method.
 
 ```python
-class CustomModelMethod(BaseLLMMethod):
-    def __init__(self, session: requests.Session, request_timeout: int = 30):
-        super().__init__(session)
-        self.request_timeout = request_timeout
+from article_scorers import BaseArticleScorer, ScoreResult
 
-    def score(self, title: Optional[str], snippet: Optional[str]) -> ScoreResult:
+
+class MyArticleScorer(BaseArticleScorer):
+    def score(self, title: str | None, snippet: str | None) -> ScoreResult:
         model_input = {
             "title": title or "",
             "snippet": snippet or "",
@@ -66,71 +66,32 @@ class CustomModelMethod(BaseLLMMethod):
         return ScoreResult(score=score, reason=reason)
 ```
 
-## 3. Replace the dummy model call
+If your model needs weights, credentials, GPU settings, or a local configuration file, load them inside your scorer class using your own code or environment variables.
+The scorer constructor should not require arguments.
 
-If your model is an HTTP service, replace the dummy block with:
+## 2. Make your scorer importable
 
-```python
-response = self.session.post(
-    "http://custom-model:8080/score",
-    json=model_input,
-    timeout=self.request_timeout,
-)
-response.raise_for_status()
-model_output = response.json()
-```
+When running inside the batch container, make sure both ED-Alpha's `src` directory and your scorer module are on `PYTHONPATH`.
 
-If your model is a local Python function, replace the dummy block with:
-
-```python
-model_output = call_your_model(
-    title=model_input["title"],
-    text=model_input["snippet"],
-)
-```
-
-Then adjust the mapping code so your model output becomes:
-
-```python
-ScoreResult(score=<1_to_5>, reason=<non_empty_text>)
-```
-
-## 4. Register the wrapper
-
-Update `create_llm_method` in `batch/src/llm_methods.py`.
-
-```python
-def create_llm_method(
-    session: requests.Session,
-    *,
-    api_key: str,
-    model: str,
-    reasoning_mode: str = "none",
-    supports_json_format: bool = True,
-) -> BaseLLMMethod:
-    # Add this branch for your model wrapper.
-    if model == "custom-model":
-        return CustomModelMethod(session)
-
-    # Keep the existing OpenRouter path for normal LLM models.
-    return OpenRouterChatMethod(
-        session,
-        api_key=api_key,
-        model=model,
-        reasoning_mode=reasoning_mode,
-        supports_json_format=supports_json_format,
-    )
-```
-
-## 5. Run the evaluation
-
-Create an experiment and note the printed `experiment_id`.
+For example, if your code is available at `/app/my_model/scorer.py`:
 
 ```bash
-python src/generate_labels.py --config config/custom_model_experiment.json
+PYTHONPATH=/app/src:/app python src/score_gdelt_news.py \
+  --experiment-id <experiment_id> \
+  --min-days-before 30 \
+  --max-days-before 5 \
+  --batch-size 200 \
+  --run-label "my-model" \
+  --scorer-class my_model.scorer:MyArticleScorer
 ```
 
-Score articles with your model.
+The value of `--scorer-class` must use the format:
+
+```text
+module.path:ClassName
+```
+
+For OpenRouter models, keep using the built-in scorer:
 
 ```bash
 python src/score_gdelt_news.py \
@@ -138,18 +99,27 @@ python src/score_gdelt_news.py \
   --min-days-before 30 \
   --max-days-before 5 \
   --batch-size 200 \
-  --run-label "custom-model" \
-  --model custom-model \
-  --reasoning-mode none
+  --run-label "openrouter-baseline" \
+  --model openai/gpt-5 \
+  --reasoning-mode thinking
 ```
 
-The scoring command prints a `run_id`. Use that `run_id` to aggregate and evaluate.
+`OPENROUTER_API_KEY` is required only when using `--model`.
+
+## 3. Run aggregation and metrics
+
+The scoring command prints a `run_id`.
+Use that `run_id` to aggregate per-company scores and evaluate Top-K performance.
 
 ```bash
 python src/aggregate_gdelt_run_scores.py --run-id <run_id>
 python src/calc_gdelt_run_metrics.py --run-id <run_id> --k-values 10 25 50 100
 ```
 
-## 6. If your model does not use OpenRouter
+Refresh the dashboard and select the new experiment/run to inspect ranked companies, evidence articles, matched filings, and metrics.
 
-`score_gdelt_news.py` currently checks for `OPENROUTER_API_KEY` before creating a scorer. For a non-OpenRouter model, move that check so it only applies to OpenRouter models.
+## Current scope
+
+Custom scorers operate at the article level.
+They must emit a 1-5 event-signal score plus a non-empty reason.
+Changing the company-level aggregation protocol, using arbitrary continuous scores, or plugging in a company-level ranker directly requires extending the current pipeline.

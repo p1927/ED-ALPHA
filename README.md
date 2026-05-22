@@ -134,9 +134,9 @@ Tip: use `config/predict_config.example.json` as a template and pass `--config` 
 
 ## Customization tips (for model and pipeline experiments)
 
-- Model choice: `batch/src/score_gdelt_news.py` accepts `--model`, so you can switch among models available via OpenRouter.
-- Prompt tuning: the LLM prompt for news scoring lives in `batch/src/llm_methods.py` (`_build_prompt_messages`). Edit the system/user messages (categories, instructions, output format) to adapt to new models or research goals.
-- Custom model evaluation: wrap your model as an article scorer that returns a 1-5 score plus reason, then run the same scoring, aggregation, and metrics steps. See [How to evaluate your model](docs/how-to-evaluate-your-model.md).
+- OpenRouter model choice: `batch/src/score_gdelt_news.py` accepts `--model`, so you can switch among models available via OpenRouter.
+- Prompt tuning: the built-in OpenRouter prompt lives in `batch/src/article_scorers.py` (`_build_prompt_messages`). Edit the system/user messages (categories, instructions, output format) to adapt the built-in scorer.
+- Custom model evaluation: implement a Python article scorer that returns a 1-5 score plus reason, then pass it with `--scorer-class module.path:ClassName`. See [How to evaluate your model](docs/how-to-evaluate-your-model.md).
 - Label configs: `generate_labels.py` pairs predictions with filing Item codes. Adjust `--item-codes`, `--horizon-days`, and `--predict-date`, or place a JSON config (see `batch/config/predict_config.example.json`) and pass `--config`.
 - Scoring window: tune `--min-days-before` / `--max-days-before` in `score_gdelt_news.py` to shift how far back news is considered per filing.
 - Negative sampling / seeds: `filing_experiments` store `neg_multiplier` and `seed`—edit generation parameters in `generate_labels.py` to reproduce or vary experiments.

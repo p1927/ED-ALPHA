@@ -11,20 +11,20 @@ import psycopg2
 import requests
 from bs4 import BeautifulSoup
 
-from config import build_user_agent, load_configuration
-from llm_methods import (
-    BaseLLMMethod,
-    LLMMethodError,
-    LLMResponseFormatError,
-    create_llm_method,
+from article_scorers import (
+    BaseArticleScorer,
+    create_openrouter_scorer,
+    load_article_scorer,
+    validate_score_result,
 )
+from config import build_user_agent, load_configuration
 
 
 MAX_SNIPPET_CHARS = 2000
 DEFAULT_BATCH_SIZE = 200
-LLM_MAX_RETRIES = 3
-LLM_RETRY_BASE_SECONDS = 5
-LLM_RETRY_MAX_SECONDS = 30
+SCORER_MAX_RETRIES = 3
+SCORER_RETRY_BASE_SECONDS = 5
+SCORER_RETRY_MAX_SECONDS = 30
 
 
 class ArticleFetchError(Exception):
@@ -37,7 +37,7 @@ class ArticleContentUnavailable(Exception):
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Score GDELT articles linked to filing experiment CIKs using an LLM."
+        description="Score GDELT articles linked to filing experiment CIKs using an article scorer."
     )
     parser.add_argument("--experiment-id", type=int, required=True, help="Target filing_experiments.id")
     parser.add_argument(
@@ -60,20 +60,28 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--model",
-        required=True,
-        help="LLM model name (must match one of the approved OpenRouter models).",
+        help="OpenRouter model name for the built-in OpenRouter scorer.",
+    )
+    parser.add_argument(
+        "--scorer-class",
+        help="Custom Python scorer class as module.path:ClassName.",
     )
     parser.add_argument(
         "--reasoning-mode",
         choices=["none", "thinking"],
-        required=True,
-        help="Reasoning mode flag for OpenRouter models (must be 'none' or 'thinking').",
+        default="none",
+        help="Reasoning mode flag for OpenRouter models (default: none).",
     )
     parser.add_argument(
         "--run-label",
         help="Optional label to record alongside this scoring run.",
     )
     return parser.parse_args()
+
+
+def validate_scorer_args(args: argparse.Namespace) -> None:
+    if bool(args.model) == bool(args.scorer_class):
+        raise ValueError("Specify exactly one of --model or --scorer-class.")
 
 
 def validate_day_window(min_days_before: int, max_days_before: int) -> None:
@@ -266,32 +274,73 @@ def get_article_content(
 
 
 def score_article(
-    llm_method: BaseLLMMethod,
+    article_scorer: BaseArticleScorer,
     title: Optional[str],
     snippet: Optional[str],
 ) -> Tuple[int, str]:
     last_error: Optional[Exception] = None
-    method_name = type(llm_method).__name__
-    for attempt in range(1, LLM_MAX_RETRIES + 1):
+    scorer_name = type(article_scorer).__name__
+    for attempt in range(1, SCORER_MAX_RETRIES + 1):
         try:
-            result = llm_method.score(title, snippet)
+            result = validate_score_result(article_scorer.score(title, snippet))
             return result.score, result.reason
-        except (LLMMethodError, LLMResponseFormatError, requests.RequestException) as exc:
+        except (ValueError, requests.RequestException) as exc:
             last_error = exc
-            if attempt == LLM_MAX_RETRIES:
+            if attempt == SCORER_MAX_RETRIES:
                 raise RuntimeError(
-                    f"LLM request failed after {LLM_MAX_RETRIES} attempts: {exc}"
+                    f"Article scoring failed after {SCORER_MAX_RETRIES} attempts: {exc}"
                 ) from exc
-            wait_seconds = min(LLM_RETRY_BASE_SECONDS * (2 ** (attempt - 1)), LLM_RETRY_MAX_SECONDS)
+            wait_seconds = min(
+                SCORER_RETRY_BASE_SECONDS * (2 ** (attempt - 1)),
+                SCORER_RETRY_MAX_SECONDS,
+            )
             print(
-                f"LLM request failed via {method_name} (attempt {attempt}/{LLM_MAX_RETRIES}): "
+                f"Article scoring failed via {scorer_name} (attempt {attempt}/{SCORER_MAX_RETRIES}): "
                 f"{exc}. Retrying in {wait_seconds}s.",
                 file=sys.stderr,
             )
             time.sleep(wait_seconds)
     if last_error is not None:
-        raise RuntimeError(f"LLM scoring failed: {last_error}") from last_error
-    raise RuntimeError("LLM scoring failed without receiving an error.")
+        raise RuntimeError(f"Article scoring failed: {last_error}") from last_error
+    raise RuntimeError("Article scoring failed without receiving an error.")
+
+
+def create_article_scorer(
+    args: argparse.Namespace,
+    session: requests.Session,
+) -> Tuple[BaseArticleScorer, str, str]:
+    validate_scorer_args(args)
+
+    if args.scorer_class:
+        scorer_class_path = args.scorer_class.strip()
+        if not scorer_class_path:
+            raise ValueError("--scorer-class cannot be empty.")
+        scorer = load_article_scorer(scorer_class_path)
+        return scorer, f"python:{scorer_class_path}", f"python scorer={scorer_class_path}"
+
+    model_name = args.model.strip()
+    if not model_name:
+        raise ValueError("OpenRouter model name is required via --model.")
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY is required when using --model.")
+
+    supports_json = not model_name.startswith("anthropic/claude-sonnet-4.5")
+    if not supports_json:
+        print(
+            "Note: Selected model does not support JSON response_format; "
+            "falling back to text parsing.",
+            file=sys.stderr,
+        )
+    scorer = create_openrouter_scorer(
+        session,
+        api_key=api_key,
+        model=model_name,
+        reasoning_mode=args.reasoning_mode,
+        supports_json_format=supports_json,
+    )
+    return scorer, model_name, f"openrouter model={model_name} reasoning_mode={args.reasoning_mode}"
 
 
 def upsert_score(
@@ -376,6 +425,11 @@ def create_scoring_run(
 def main() -> None:
     args = parse_args()
     validate_day_window(args.min_days_before, args.max_days_before)
+    try:
+        validate_scorer_args(args)
+    except ValueError as exc:
+        print(f"Scorer argument error: {exc}", file=sys.stderr)
+        sys.exit(1)
 
     try:
         config = load_configuration()
@@ -385,15 +439,7 @@ def main() -> None:
 
     user_agent = build_user_agent(config["user_email"])
 
-    reasoning_mode = args.reasoning_mode.lower()
-    if reasoning_mode not in {"none", "thinking"}:
-        print("Reasoning mode must be 'none' or 'thinking'.", file=sys.stderr)
-        sys.exit(1)
-
-    model_name = args.model.strip()
-    if not model_name:
-        print("LLM model name is required via --model.", file=sys.stderr)
-        sys.exit(1)
+    args.reasoning_mode = args.reasoning_mode.lower()
 
     batch_size = max(args.batch_size, 1)
 
@@ -402,6 +448,9 @@ def main() -> None:
     except Exception as exc:
         print(f"Database connection failed: {exc}", file=sys.stderr)
         sys.exit(1)
+
+    article_session = None
+    scorer_session = None
 
     try:
         with connection.cursor() as cursor:
@@ -415,27 +464,13 @@ def main() -> None:
         print(f"time_window_start={start_time_str}")
         print(f"time_window_end={end_time_str}")
 
-        api_key = os.getenv("OPENROUTER_API_KEY")
-        if not api_key:
-            print("OPENROUTER_API_KEY is required.", file=sys.stderr)
-            sys.exit(1)
-
         article_session = requests.Session()
-        llm_session = requests.Session()
-        supports_json = not model_name.startswith("anthropic/claude-sonnet-4.5")
-        if not supports_json:
-            print(
-                "Note: Selected model does not support JSON response_format; "
-                "falling back to text parsing.",
-                file=sys.stderr,
-            )
-        llm_method = create_llm_method(
-            llm_session,
-            api_key=api_key,
-            model=model_name,
-            reasoning_mode=reasoning_mode,
-            supports_json_format=supports_json,
-        )
+        scorer_session = requests.Session()
+        try:
+            article_scorer, model_name, scorer_description = create_article_scorer(args, scorer_session)
+        except Exception as exc:
+            print(f"Failed to create article scorer: {exc}", file=sys.stderr)
+            sys.exit(1)
 
         run_id = create_scoring_run(
             connection,
@@ -453,7 +488,7 @@ def main() -> None:
             f"between {start_time_str} and {end_time_str}.",
             file=sys.stderr,
         )
-        print(f"LLM provider=openrouter model={model_name} reasoning_mode={reasoning_mode}.", file=sys.stderr)
+        print(f"Article scorer provider={scorer_description}.", file=sys.stderr)
 
         score_cache: Dict[str, Tuple[int, str]] = {}
         failed_articles: set[str] = set()
@@ -461,7 +496,7 @@ def main() -> None:
         scored = 0
         skipped_fetch = 0
         skipped_missing = 0
-        skipped_llm = 0
+        skipped_scorer = 0
 
         with connection.cursor() as cursor:
             for (
@@ -514,18 +549,18 @@ def main() -> None:
                     score_start = time.perf_counter()
                     try:
                         score, reason = score_article(
-                            llm_method,
+                            article_scorer,
                             title,
                             snippet,
                         )
                     except RuntimeError as exc:
-                        skipped_llm += 1
+                        skipped_scorer += 1
                         failed_articles.add(cache_key)
-                        print(f"Skip (LLM error after retries): {article_url} ({exc})", file=sys.stderr)
+                        print(f"Skip (scorer error after retries): {article_url} ({exc})", file=sys.stderr)
                         continue
                     except Exception as exc:
                         score_duration = time.perf_counter() - score_start
-                        print(f"LLM scoring failed for {article_url}: {exc}", file=sys.stderr)
+                        print(f"Article scoring failed for {article_url}: {exc}", file=sys.stderr)
                         raise
                     score_duration = time.perf_counter() - score_start
                     score_cache[cache_key] = (score, reason)
@@ -556,13 +591,15 @@ def main() -> None:
         print(
             f"Run {run_id} processed {processed} records; scored {scored}; "
             f"skipped (fetch errors) {skipped_fetch}; skipped (missing content) {skipped_missing}; "
-            f"skipped (LLM failures) {skipped_llm}.",
+            f"skipped (scorer failures) {skipped_scorer}.",
             file=sys.stderr,
         )
     finally:
         connection.close()
-        article_session.close()
-        llm_session.close()
+        if article_session is not None:
+            article_session.close()
+        if scorer_session is not None:
+            scorer_session.close()
 
 
 if __name__ == "__main__":
