@@ -64,3 +64,20 @@ class ResultsResponse(BaseModel):
     run_id: int
     k: int
     results: List[ResultRow]
+
+
+class TickerPrediction(BaseModel):
+    """Per-ticker corp-event forecast for research pipeline integrations."""
+    ticker: str
+    status: str
+    cik: Optional[int] = None
+    company_name: Optional[str] = None
+    total_score: Optional[int] = None
+    rank: Optional[int] = None
+    experiment_id: Optional[int] = None
+    run_id: Optional[int] = None
+    predict_date: Optional[date] = None
+    horizon_days: Optional[int] = None
+    evidence: List[Evidence] = Field(default_factory=list)
+    event: Optional[EventInfo] = None
+    detail: Optional[str] = None

@@ -19,6 +19,7 @@ from models import (
     EventInfo,
     ResultRow,
     ResultsResponse,
+    TickerPrediction,
 )
 
 # ============================================================
@@ -388,6 +389,181 @@ async def get_experiment_results(
             )
 
         return ResultsResponse(experiment_id=experiment_id, run_id=run_id, k=k, results=results)
+
+
+@app.get("/predictions/{ticker}", response_model=TickerPrediction)
+async def get_prediction_by_ticker(
+    ticker: str,
+    evidence_per_company: int = Query(5, ge=1, le=10),
+):
+    """
+    Return the latest ED-ALPHA score for a US ticker symbol.
+
+    Used by the Trade company-research corp_events stage. Requires batch ingest
+    (company tickers + GDELT scoring run) to return ranked predictions.
+    """
+    _require_pool()
+    symbol = ticker.strip().upper()
+    if not symbol:
+        raise HTTPException(status_code=400, detail="ticker is required")
+
+    async with _pool.acquire() as conn:
+        ticker_row = await conn.fetchrow(
+            """
+            SELECT ct.cik, cp.title AS company_name
+            FROM company_tickers ct
+            JOIN company_profiles cp ON cp.cik = ct.cik
+            WHERE UPPER(ct.ticker) = $1
+            ORDER BY ct.cik
+            LIMIT 1
+            """,
+            symbol,
+        )
+        if not ticker_row:
+            return TickerPrediction(
+                ticker=symbol,
+                status="not_found",
+                detail=f"Ticker {symbol} not in company_tickers; run fetch_company_tickers.py",
+            )
+
+        cik = int(ticker_row["cik"])
+        company_name = ticker_row["company_name"]
+
+        exp = await conn.fetchrow(
+            """
+            SELECT fe.id,
+                   fe.predict_date,
+                   fe.horizon_days,
+                   COALESCE(array_agg(gr.id ORDER BY gr.id DESC)
+                            FILTER (WHERE gr.id IS NOT NULL), '{}') AS run_ids
+            FROM filing_experiments fe
+            LEFT JOIN gdelt_scoring_runs gr ON gr.experiment_id = fe.id
+            GROUP BY fe.id
+            HAVING COUNT(gr.id) > 0
+            ORDER BY fe.created_at DESC
+            LIMIT 1
+            """
+        )
+        if not exp or not exp["run_ids"]:
+            return TickerPrediction(
+                ticker=symbol,
+                status="no_data",
+                cik=cik,
+                company_name=company_name,
+                detail=(
+                    "No scoring runs yet. Start batch ingest inside ed-alpha "
+                    "(fetch_company_tickers, GDELT, generate_labels, score_gdelt_news)."
+                ),
+            )
+
+        experiment_id = int(exp["id"])
+        run_id = int(exp["run_ids"][0])
+        predict_date: date = exp["predict_date"]
+        horizon_days: int = exp["horizon_days"]
+        end_date: date = predict_date + timedelta(days=horizon_days)
+
+        score_row = await conn.fetchrow(
+            """
+            SELECT total_score,
+                   (SELECT COUNT(*) + 1
+                    FROM gdelt_run_cik_scores r2
+                    WHERE r2.run_id = r.run_id AND r2.total_score > r.total_score) AS rank
+            FROM gdelt_run_cik_scores r
+            WHERE r.run_id = $1 AND r.cik = $2
+            """,
+            run_id,
+            cik,
+        )
+
+        evidence_rows = await conn.fetch(
+            """
+            SELECT s.llm_score,
+                   s.llm_reason,
+                   s.evaluated_at,
+                   a.article_url,
+                   a.title
+            FROM gdelt_article_scores s
+            JOIN gdelt_articles a ON a.article_url = s.article_url
+            WHERE s.run_id = $1 AND s.cik = $2
+            ORDER BY s.llm_score DESC, s.evaluated_at DESC
+            LIMIT $3
+            """,
+            run_id,
+            cik,
+            evidence_per_company,
+        )
+
+        event_row = await conn.fetchrow(
+            """
+            SELECT f.accession_number,
+                   f.form,
+                   f.filing_date,
+                   f.primary_document,
+                   f.items
+            FROM company_recent_filings f
+            WHERE f.cik = $1
+              AND f.form ILIKE '8-K%%'
+              AND (f.filing_date IS NULL OR (f.filing_date >= $2 AND f.filing_date <= $3))
+            ORDER BY f.filing_date DESC NULLS LAST
+            LIMIT 1
+            """,
+            cik,
+            predict_date,
+            end_date,
+        )
+
+    evidence = [
+        Evidence(
+            llm_score=row["llm_score"],
+            summary=row["llm_reason"],
+            url=row["article_url"],
+            title=row["title"],
+            evaluated_at=row["evaluated_at"],
+        )
+        for row in evidence_rows
+    ]
+
+    event = None
+    if event_row and event_row["primary_document"] and event_row["accession_number"]:
+        event = EventInfo(
+            accession_number=event_row["accession_number"],
+            form=event_row["form"],
+            filing_date=event_row["filing_date"],
+            primary_document=event_row["primary_document"],
+            items=event_row["items"],
+            url=_sec_doc_url(cik, event_row["accession_number"], event_row["primary_document"]),
+        )
+
+    if not score_row:
+        return TickerPrediction(
+            ticker=symbol,
+            status="no_score",
+            cik=cik,
+            company_name=company_name,
+            experiment_id=experiment_id,
+            run_id=run_id,
+            predict_date=predict_date,
+            horizon_days=horizon_days,
+            evidence=evidence,
+            event=event,
+            detail=f"{symbol} not ranked in run_id={run_id}; company may be outside top-K.",
+        )
+
+    return TickerPrediction(
+        ticker=symbol,
+        status="ok",
+        cik=cik,
+        company_name=company_name,
+        total_score=int(score_row["total_score"]),
+        rank=int(score_row["rank"]) if score_row["rank"] is not None else None,
+        experiment_id=experiment_id,
+        run_id=run_id,
+        predict_date=predict_date,
+        horizon_days=horizon_days,
+        evidence=evidence,
+        event=event,
+    )
+
 
 @app.get("/health")
 async def health():
