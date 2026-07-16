@@ -3,7 +3,8 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 RUN corepack enable
 COPY app/frontend/package.json app/frontend/pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm config set ignore-scripts false \
+    && pnpm install --frozen-lockfile
 
 FROM node:22-alpine AS builder
 WORKDIR /app
@@ -11,7 +12,8 @@ RUN corepack enable
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 COPY app/frontend/package.json app/frontend/pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm config set ignore-scripts false \
+    && pnpm install --frozen-lockfile
 COPY app/frontend/ .
 ENV NEXT_TELEMETRY_DISABLED=1
 # Some installs land node_modules/.bin scripts without exec bits in certain hosts; fix before build.
