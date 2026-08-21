@@ -1,0 +1,55 @@
+name: Block company name references
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decode blocked pattern
+        id: pattern
+        run: echo "bad=$(echo 'YXNzYWFibG95' | base64 -d)" >> "$GITHUB_OUTPUT"
+
+      - name: Fail if blocked name appears in any commit author/committer identity
+        env:
+          BAD: ${{ steps.pattern.outputs.bad }}
+        run: |
+          set -e
+          matches=$(git log --all --format='%H %an <%ae> / %cn <%ce>' | grep -i "$BAD" || true)
+          if [ -n "$matches" ]; then
+            echo "Found commits with the blocked name in author/committer identity:"
+            echo "$matches"
+            exit 1
+          fi
+          echo "No blocked author/committer identities found."
+
+      - name: Fail if blocked name appears in any commit message
+        env:
+          BAD: ${{ steps.pattern.outputs.bad }}
+        run: |
+          set -e
+          matches=$(git log --all --format='%H %s' | grep -i "$BAD" || true)
+          if [ -n "$matches" ]; then
+            echo "Found commit messages containing the blocked name:"
+            echo "$matches"
+            exit 1
+          fi
+          echo "No blocked references in commit messages."
+
+      - name: Fail if blocked name appears in tracked file content
+        env:
+          BAD: ${{ steps.pattern.outputs.bad }}
+        run: |
+          set -e
+          if git grep -liI "$BAD" -- . ; then
+            echo "Found the blocked name in tracked file content (see above)."
+            exit 1
+          fi
+          echo "No blocked references in tracked files."
