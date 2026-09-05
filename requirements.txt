@@ -3,3 +3,18 @@ lxml==6.0.2
 psycopg2-binary==2.9.9
 python-dotenv==1.0.1
 requests==2.31.0
+
+# Only needed by batch/src/trade_adapter_article_scorer.py's TradeAdapterArticleScorer,
+# which routes scoring through the Trade monorepo's own LLM adapter registry
+# (integrations/trade_integrations/dataflows/model_adapters/) instead of OpenRouter.
+# Harmless/unused for a standalone (non-Trade) ed-alpha checkout that never selects
+# --scorer-class trade_adapter_article_scorer:TradeAdapterArticleScorer.
+# pandas is pulled in transitively (trade_integrations/__init__.py -> ... ->
+# trade_integrations/stock_simulator/factor_reads.py does `import pandas as pd`) even
+# though the scorer's own code never touches a DataFrame directly — live-verified inside
+# the batch container: import fails without it. requests is already listed above and
+# satisfies the other transitive need (trade_integrations/http/gateway.py).
+openai==2.54.0
+httpx==0.28.1
+PyYAML==6.0.3
+pandas==2.3.3

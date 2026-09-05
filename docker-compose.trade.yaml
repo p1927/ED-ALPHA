@@ -1,0 +1,67 @@
+# Optional Compose override — only relevant when ed-alpha is checked out as a git
+# submodule inside the Trade monorepo (i.e. this file's parent's parent contains
+# `integrations/trade_integrations`). It has no effect on the default, standalone
+# ed-alpha workflow described in README.md and must never be required by it.
+#
+# What it adds to the `batch` service, additively, on top of docker-compose.yaml:
+#   - a read-only bind mount of the Trade repo's `integrations/` package, so
+#     `batch/src/trade_adapter_article_scorer.py`'s TradeAdapterArticleScorer can
+#     import `trade_integrations.dataflows.model_adapters` inside the container the
+#     same way it already works host-side (see that file's own docstring and
+#     .claude/backlog/archive/items/2026-09-05-ed-alpha-openrouter-scorer.md).
+#   - the Trade repo's own root .env (one level up), so NVIDIA_API_KEY /
+#     MINIMAX_API_KEY / TRADE_STACK_HUB_DIR / etc. reach the container the same way
+#     every other Trade-stack process picks them up — no need to hand-list adapter
+#     env vars here, and new ones added to catalog.yaml keep working automatically.
+#   - TRADE_INTEGRATIONS_SKIP_APPLY=1, so importing trade_integrations does not also
+#     pull in tradingagents/yfinance/alpaca registration (apply() in
+#     trade_integrations/register.py) — the scorer only needs the model_adapters
+#     registry, not the full TradingAgents vendor-patching surface, and skipping it
+#     keeps this container from needing that much heavier dependency set.
+#   - a read-only mount of stack/certs plus SSL_CERT_FILE/REQUESTS_CA_BUNDLE
+#     overrides pointed at it. The root .env's own SSL_CERT_FILE/REQUESTS_CA_BUNDLE
+#     (corporate CA bundle for HTTPS interception) are host-absolute paths
+#     (/Users/.../Trade/stack/certs/combined-ca-bundle.pem) that don't exist inside
+#     the container — passed through unmodified via env_file above, openai/httpx
+#     fail immediately with FileNotFoundError trying to load them (live-verified).
+#     Re-pointing both at the mounted /app/certs/... path fixes this without
+#     touching the real .env or hardcoding a host username into the mount source.
+#
+# Known limitation (live-verified, not a bug in this wiring): the adapter registry's
+# priority-1 provider, minimax-generative, has its own separate transitive dependency
+# on the `tradingagents` submodule several import layers down (generative.py's
+# _call_minimax -> news_hub_bridge.internal.news_distillation -> ... ->
+# news_aggregator/aggregator.py's `from tradingagents.dataflows.config import
+# get_config`), which this override does not mount. Inside this container that import
+# fails and the registry's own failover falls back to nvidia-generative, which works
+# and returns real, sane scores (live-verified) — so TradeAdapterArticleScorer still
+# functions correctly here, just not via its normally-preferred provider. Mounting
+# `tradingagents/` too (plus its own dependency set) would restore parity but is
+# disproportionate for this one isolated batch job; filed as a separate,
+# ed-alpha-independent architecture question rather than expanded here.
+#
+# Usage (from ed-alpha/):
+#   docker compose -f docker-compose.yaml -f docker-compose.trade.yaml \
+#     --profile batch up -d batch
+#   docker compose -f docker-compose.yaml -f docker-compose.trade.yaml \
+#     exec -it batch sh
+#   cd /app && python src/score_gdelt_news.py ... \
+#     --scorer-class trade_adapter_article_scorer:TradeAdapterArticleScorer
+#
+# See docs/FORK_CONVENTIONS.md in the Trade repo root for why this is a separate,
+# additive file rather than a change to docker-compose.yaml itself.
+
+version: "3.9"
+
+services:
+  batch:
+    env_file:
+      - .env
+      - ../.env
+    environment:
+      TRADE_INTEGRATIONS_SKIP_APPLY: "1"
+      SSL_CERT_FILE: /app/certs/combined-ca-bundle.pem
+      REQUESTS_CA_BUNDLE: /app/certs/combined-ca-bundle.pem
+    volumes:
+      - ../integrations:/app/integrations:ro
+      - ../stack/certs:/app/certs:ro
