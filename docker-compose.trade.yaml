@@ -48,6 +48,24 @@
 #   cd /app && python src/score_gdelt_news.py ... \
 #     --scorer-class trade_adapter_article_scorer:TradeAdapterArticleScorer
 #
+# What it adds to the `frontend` service, additively:
+#   - remaps the frontend container's HOST port from the 3000 hardcoded in
+#     docker-compose.yaml to ${ED_ALPHA_FRONTEND_HOST_PORT:-3000}. Outside this
+#     monorepo the env var is unset, so the default keeps standalone behavior
+#     identical to upstream. Inside it, Trade's stack/ports.yaml declares
+#     ed_alpha's own non-colliding host_port and
+#     ../scripts/start_ed_alpha.sh exports it as this var before invoking
+#     compose — because host 3000 here is ALSO steel_browser's declared port
+#     (stack/ports.yaml), and steel_browser is enabled far more often, as
+#     browseros_research's default browser backend. Unremapped, the two
+#     collide at the Docker bind level, and worse, Trade's UI gateway used to
+#     proxy /apps/ed-alpha/* to a hardcoded :3000 and silently serve whichever
+#     one actually held the port (confirmed live: the Steel Browser API, with
+#     HTTP 200). See
+#     .claude/backlog/archive/items/2026-09-06-ed-alpha-steel-port-collision.md
+#     in the Trade repo. The container's OWN internal port is untouched (still
+#     3000) — only which host port Docker binds it to changes.
+#
 # See docs/FORK_CONVENTIONS.md in the Trade repo root for why this is a separate,
 # additive file rather than a change to docker-compose.yaml itself.
 
@@ -65,3 +83,14 @@ services:
     volumes:
       - ../integrations:/app/integrations:ro
       - ../stack/certs:/app/certs:ro
+
+  frontend:
+    # `!override` (Compose Spec merge tag) is required here, not a plain list:
+    # Compose merges `ports:` sequences across -f files by APPENDING, not
+    # replacing, so a plain override left the base file's literal "3000:3000"
+    # bound in addition to this one — verified live with
+    # `docker compose ... config`, which showed BOTH mappings once
+    # ED_ALPHA_FRONTEND_HOST_PORT was set to a different value. `!override`
+    # is the one way to fully replace rather than merge a value.
+    ports: !override
+      - "${ED_ALPHA_FRONTEND_HOST_PORT:-3000}:3000"
