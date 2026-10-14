@@ -114,6 +114,9 @@ async def on_startup():
         command_timeout=60,
         statement_cache_size=2048,
     )
+    # Same additive statement as db/10_alter_gdelt_scoring_runs_partial.sql (init scripts run only on a fresh DB).
+    async with _pool.acquire() as conn:
+        await conn.execute("ALTER TABLE gdelt_scoring_runs ADD COLUMN IF NOT EXISTS partial BOOLEAN")
 
 
 @app.on_event("shutdown")
@@ -437,7 +440,7 @@ async def get_prediction_by_ticker(
                    COALESCE(array_agg(gr.id ORDER BY gr.id DESC)
                             FILTER (WHERE gr.id IS NOT NULL), '{}') AS run_ids
             FROM filing_experiments fe
-            LEFT JOIN gdelt_scoring_runs gr ON gr.experiment_id = fe.id
+            LEFT JOIN gdelt_scoring_runs gr ON gr.experiment_id = fe.id AND gr.partial IS NOT TRUE
             GROUP BY fe.id
             HAVING COUNT(gr.id) > 0
             ORDER BY fe.predict_date DESC, fe.created_at DESC

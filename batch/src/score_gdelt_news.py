@@ -367,6 +367,17 @@ def upsert_score(
     connection.commit()
 
 
+#: Same statement as db/10_alter_gdelt_scoring_runs_partial.sql (init scripts only run on a fresh database).
+ADD_PARTIAL_COLUMN_SQL = "ALTER TABLE gdelt_scoring_runs ADD COLUMN IF NOT EXISTS partial BOOLEAN"
+
+
+def mark_run_partial(connection: psycopg2.extensions.connection, run_id: int, partial: bool) -> None:
+    """Record whether the run scored every article (``False``) or not (``True``)."""
+    with connection.cursor() as cursor:
+        cursor.execute("UPDATE gdelt_scoring_runs SET partial = %s WHERE id = %s", (partial, run_id))
+    connection.commit()
+
+
 def create_scoring_run(
     connection: psycopg2.extensions.connection,
     experiment_id: int,
@@ -377,6 +388,7 @@ def create_scoring_run(
     run_label: Optional[str],
 ) -> int:
     with connection.cursor() as cursor:
+        cursor.execute(ADD_PARTIAL_COLUMN_SQL)
         cursor.execute(
             """
             INSERT INTO gdelt_scoring_runs (
@@ -385,9 +397,10 @@ def create_scoring_run(
                 max_days_before,
                 batch_size,
                 model_name,
-                run_label
+                run_label,
+                partial
             )
-            VALUES (%s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, TRUE)
             RETURNING id
             """,
             (
@@ -572,8 +585,9 @@ def main() -> None:
             f"skipped (scorer failures) {skipped_scorer}.",
             file=sys.stderr,
         )
+        mark_run_partial(connection, run_id, bool(skipped_scorer))
         if skipped_scorer:
-            # The run's rows are kept, but it is PARTIAL: say so in the exit status.
+            # The run's rows are kept, but it is PARTIAL (marked in the DB): say so in the exit status.
             raise SystemExit(
                 f"Run {run_id} is partial: {skipped_scorer} articles were not scored; "
                 "its total_score understates those companies."
