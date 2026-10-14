@@ -116,107 +116,6 @@ def _parse_json_payload(content: str) -> ScoreResult:
     return validate_score_result(ScoreResult(score=score, reason=reason))
 
 
-def _extract_content_from_body(body: Dict[str, object]) -> str:
-    # Chat Completions format
-    if "choices" in body:
-        choices = body["choices"]
-        if not isinstance(choices, list) or not choices:
-            raise ValueError("Chat Completions response missing choices.")
-        first = choices[0]
-        if not isinstance(first, dict):
-            raise ValueError("Chat Completions choice must be an object.")
-        message = first.get("message")
-        if not isinstance(message, dict):
-            raise ValueError("Chat Completions message missing.")
-        content = message.get("content")
-        if not isinstance(content, str):
-            raise ValueError("Chat Completions message content missing.")
-        return content
-
-    # Responses API format
-    if "output" in body:
-        output = body["output"]
-        if not isinstance(output, list):
-            raise ValueError("Responses output must be a list.")
-        for item in output:
-            if not isinstance(item, dict):
-                continue
-            if item.get("type") not in {"message", "output_text"}:
-                continue
-            content = item.get("content")
-            if isinstance(content, list):
-                for chunk in content:
-                    if isinstance(chunk, dict) and chunk.get("type") in {"output_text", "text"}:
-                        text = chunk.get("text")
-                        if isinstance(text, str) and text.strip():
-                            return text
-            text_value = item.get("text")
-            if isinstance(text_value, str) and text_value.strip():
-                return text_value
-        raise ValueError("Responses output missing text content.")
-
-    raise ValueError("Unsupported response payload structure.")
-
-
-class OpenRouterArticleScorer(BaseArticleScorer):
-    def __init__(
-        self,
-        session: requests.Session,
-        api_key: str,
-        model: str,
-        *,
-        reasoning_mode: str = "none",
-        request_timeout: int = 30,
-        supports_json_format: bool = True,
-        supports_reasoning: bool = True,
-    ):
-        self.session = session
-        self.api_key = api_key
-        self.model = model
-        self.reasoning_mode = reasoning_mode
-        self.request_timeout = request_timeout
-        self.supports_json_format = supports_json_format
-        self.supports_reasoning = supports_reasoning
-
-    def score(self, title: Optional[str], snippet: Optional[str]) -> ScoreResult:
-        messages = _build_prompt_messages(title, snippet)
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-
-        payload: Dict[str, object] = {
-            "model": self.model,
-            "messages": messages,
-            "temperature": 0,
-        }
-        if self.supports_json_format:
-            payload["response_format"] = {"type": "json_object"}
-        if self.reasoning_mode == "thinking" and self.supports_reasoning:
-            payload["reasoning"] = {"effort": "medium"}
-
-        response = self.session.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            data=json.dumps(payload),
-            timeout=self.request_timeout,
-        )
-        try:
-            response.raise_for_status()
-        except requests.RequestException as exc:
-            detail = ""
-            try:
-                body_text = response.text
-                if body_text:
-                    detail = f" Response body: {body_text}"
-            except Exception:
-                pass
-            raise requests.HTTPError(f"OpenRouter request failed: {exc}.{detail}") from exc
-
-        content = _extract_content_from_body(response.json())
-        return _parse_json_payload(content)
-
-
 def load_article_scorer(path: str) -> BaseArticleScorer:
     if ":" not in path:
         raise ValueError("Scorer class must be specified as 'module.path:ClassName'.")
@@ -243,28 +142,9 @@ def load_article_scorer(path: str) -> BaseArticleScorer:
     return scorer
 
 
-def create_openrouter_scorer(
-    session: requests.Session,
-    *,
-    api_key: str,
-    model: str,
-    reasoning_mode: str = "none",
-    supports_json_format: bool = True,
-) -> OpenRouterArticleScorer:
-    return OpenRouterArticleScorer(
-        session,
-        api_key=api_key,
-        model=model,
-        reasoning_mode=reasoning_mode,
-        supports_json_format=supports_json_format,
-    )
-
-
 __all__ = [
     "BaseArticleScorer",
-    "OpenRouterArticleScorer",
     "ScoreResult",
-    "create_openrouter_scorer",
     "load_article_scorer",
     "validate_score_result",
 ]

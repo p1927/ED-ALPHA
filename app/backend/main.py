@@ -440,7 +440,7 @@ async def get_prediction_by_ticker(
             LEFT JOIN gdelt_scoring_runs gr ON gr.experiment_id = fe.id
             GROUP BY fe.id
             HAVING COUNT(gr.id) > 0
-            ORDER BY fe.created_at DESC
+            ORDER BY fe.predict_date DESC, fe.created_at DESC
             LIMIT 1
             """
         )

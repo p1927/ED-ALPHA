@@ -8,7 +8,7 @@ import pytest
 import requests
 
 from article_scorers import BaseArticleScorer, ScoreResult, load_article_scorer, validate_score_result
-from llm_methods import BaseLLMMethod, OpenRouterChatMethod, create_llm_method
+from llm_methods import BaseLLMMethod, create_llm_method
 from score_gdelt_news import create_article_scorer, score_article, validate_scorer_args
 
 
@@ -33,7 +33,6 @@ def args(**overrides):
     defaults = {
         "model": None,
         "scorer_class": None,
-        "reasoning_mode": "none",
     }
     defaults.update(overrides)
     return SimpleNamespace(**defaults)
@@ -119,18 +118,17 @@ def test_validate_score_result_rejects_invalid_results():
 
 
 def test_validate_scorer_args_requires_exactly_one_scorer_kind():
-    validate_scorer_args(args(model="openai/gpt-5"))
+    validate_scorer_args(args(model="minimax"))
     validate_scorer_args(args(scorer_class="custom_duck:DuckScorer"))
 
     with pytest.raises(ValueError, match="exactly one"):
         validate_scorer_args(args())
 
     with pytest.raises(ValueError, match="exactly one"):
-        validate_scorer_args(args(model="openai/gpt-5", scorer_class="custom_duck:DuckScorer"))
+        validate_scorer_args(args(model="minimax", scorer_class="custom_duck:DuckScorer"))
 
 
-def test_create_article_scorer_uses_custom_class_without_openrouter_key(importable_tmp_path, monkeypatch):
-    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+def test_create_article_scorer_uses_custom_class_without_any_model_key(importable_tmp_path, monkeypatch):
     write_module(
         importable_tmp_path,
         "custom_selection",
@@ -153,33 +151,24 @@ class SelectionScorer:
     assert description == "python scorer=custom_selection:SelectionScorer"
 
 
-def test_create_article_scorer_requires_key_for_openrouter(monkeypatch):
-    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+def test_model_flag_builds_the_trade_adapter_scorer_never_openrouter(monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "must-be-ignored")
+    scorer, model_name, description = create_article_scorer(args(model="minimax"), requests.Session())
 
-    with pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
-        create_article_scorer(args(model="openai/gpt-5"), requests.Session())
+    assert type(scorer).__name__ == "TradeAdapterArticleScorer"
+    assert scorer.adapter_id == "minimax"
+    assert model_name == "minimax"
+    assert description == "trade adapter=minimax"
+    import article_scorers
 
-    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
-    scorer, model_name, description = create_article_scorer(
-        args(model="openai/gpt-5", reasoning_mode="thinking"),
-        requests.Session(),
-    )
-
-    assert type(scorer).__name__ == "OpenRouterArticleScorer"
-    assert model_name == "openai/gpt-5"
-    assert description == "openrouter model=openai/gpt-5 reasoning_mode=thinking"
+    assert not hasattr(article_scorers, "OpenRouterArticleScorer")
 
 
 def test_llm_methods_compatibility_aliases_keep_existing_imports_working():
     session = requests.Session()
 
     base = BaseLLMMethod(session)
-    scorer = create_llm_method(
-        session,
-        api_key="test-key",
-        model="openai/gpt-5",
-        reasoning_mode="none",
-    )
+    scorer = create_llm_method(adapter_id="minimax")
 
     assert base.session is session
-    assert isinstance(scorer, OpenRouterChatMethod)
+    assert type(scorer).__name__ == "TradeAdapterArticleScorer"

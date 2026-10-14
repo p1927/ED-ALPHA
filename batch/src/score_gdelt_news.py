@@ -13,7 +13,6 @@ from bs4 import BeautifulSoup
 
 from article_scorers import (
     BaseArticleScorer,
-    create_openrouter_scorer,
     load_article_scorer,
     validate_score_result,
 )
@@ -60,17 +59,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--model",
-        help="OpenRouter model name for the built-in OpenRouter scorer.",
+        help="Trade model-adapter id for the built-in scorer (Trade's LLM adapter registry).",
     )
     parser.add_argument(
         "--scorer-class",
         help="Custom Python scorer class as module.path:ClassName.",
-    )
-    parser.add_argument(
-        "--reasoning-mode",
-        choices=["none", "thinking"],
-        default="none",
-        help="Reasoning mode flag for OpenRouter models (default: none).",
     )
     parser.add_argument(
         "--run-label",
@@ -324,27 +317,12 @@ def create_article_scorer(
 
     model_name = args.model.strip()
     if not model_name:
-        raise ValueError("OpenRouter model name is required via --model.")
+        raise ValueError("Trade adapter id is required via --model.")
 
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        raise ValueError("OPENROUTER_API_KEY is required when using --model.")
+    from trade_adapter_article_scorer import create_trade_adapter_scorer
 
-    supports_json = not model_name.startswith("anthropic/claude-sonnet-4.5")
-    if not supports_json:
-        print(
-            "Note: Selected model does not support JSON response_format; "
-            "falling back to text parsing.",
-            file=sys.stderr,
-        )
-    scorer = create_openrouter_scorer(
-        session,
-        api_key=api_key,
-        model=model_name,
-        reasoning_mode=args.reasoning_mode,
-        supports_json_format=supports_json,
-    )
-    return scorer, model_name, f"openrouter model={model_name} reasoning_mode={args.reasoning_mode}"
+    scorer = create_trade_adapter_scorer(adapter_id=model_name)
+    return scorer, model_name, f"trade adapter={model_name}"
 
 
 def upsert_score(
@@ -557,15 +535,11 @@ def main() -> None:
                             title,
                             snippet,
                         )
-                    except RuntimeError as exc:
+                    except Exception as exc:  # RuntimeError after retries, or an adapter/provider error
                         skipped_scorer += 1
                         failed_articles.add(cache_key)
-                        print(f"Skip (scorer error after retries): {article_url} ({exc})", file=sys.stderr)
+                        print(f"Skip (scorer error): {article_url} ({type(exc).__name__}: {exc})", file=sys.stderr)
                         continue
-                    except Exception as exc:
-                        score_duration = time.perf_counter() - score_start
-                        print(f"Article scoring failed for {article_url}: {exc}", file=sys.stderr)
-                        raise
                     score_duration = time.perf_counter() - score_start
                     score_cache[cache_key] = (score, reason)
 
@@ -598,6 +572,12 @@ def main() -> None:
             f"skipped (scorer failures) {skipped_scorer}.",
             file=sys.stderr,
         )
+        if skipped_scorer:
+            # The run's rows are kept, but it is PARTIAL: say so in the exit status.
+            raise SystemExit(
+                f"Run {run_id} is partial: {skipped_scorer} articles were not scored; "
+                "its total_score understates those companies."
+            )
     finally:
         connection.close()
         if article_session is not None:

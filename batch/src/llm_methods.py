@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from article_scorers import (
-    BaseArticleScorer,
-    OpenRouterArticleScorer,
-    ScoreResult,
-    create_openrouter_scorer,
-)
+from article_scorers import BaseArticleScorer, ScoreResult
 
 
 class LLMMethodError(RuntimeError):
@@ -17,31 +12,19 @@ class LLMResponseFormatError(ValueError):
 
 
 BaseLLMMethod = BaseArticleScorer
-OpenRouterChatMethod = OpenRouterArticleScorer
 
 
-def create_llm_method(
-    session,
-    *,
-    api_key: str,
-    model: str,
-    reasoning_mode: str = "none",
-    supports_json_format: bool = True,
-) -> BaseArticleScorer:
-    return create_openrouter_scorer(
-        session,
-        api_key=api_key,
-        model=model,
-        reasoning_mode=reasoning_mode,
-        supports_json_format=supports_json_format,
-    )
+def create_llm_method(*, adapter_id: str | None = None) -> BaseArticleScorer:
+    """The one built-in scorer: Trade's model adapter (OpenRouter is never used in Trade)."""
+    from trade_adapter_article_scorer import create_trade_adapter_scorer
+
+    return create_trade_adapter_scorer(adapter_id=adapter_id)
 
 
 __all__ = [
     "BaseLLMMethod",
     "LLMMethodError",
     "LLMResponseFormatError",
-    "OpenRouterChatMethod",
     "ScoreResult",
     "create_llm_method",
 ]

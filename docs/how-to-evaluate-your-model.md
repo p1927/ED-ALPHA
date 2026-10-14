@@ -92,7 +92,7 @@ The value of `--scorer-class` must use the format:
 module.path:ClassName
 ```
 
-For OpenRouter models, keep using the built-in scorer:
+For models served through Trade's adapter registry, use the built-in scorer:
 
 ```bash
 python src/score_gdelt_news.py \
@@ -100,12 +100,11 @@ python src/score_gdelt_news.py \
   --min-days-before 30 \
   --max-days-before 5 \
   --batch-size 200 \
-  --run-label "openrouter-baseline" \
-  --model openai/gpt-5 \
-  --reasoning-mode thinking
+  --run-label "baseline" \
+  --model minimax
 ```
 
-`OPENROUTER_API_KEY` is required only when using `--model`.
+`--model` takes a Trade model-adapter id; it needs no OpenRouter key (OpenRouter is not supported).
 
 ## 3. Run aggregation and metrics
 

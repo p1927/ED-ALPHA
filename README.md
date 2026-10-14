@@ -31,7 +31,6 @@ PGDATABASE=postgres
 PGUSER=postgres
 PGPASSWORD=postgres
 PGSSL=disable
-OPENROUTER_API_KEY=xxx        # only if you need it
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
@@ -109,8 +108,7 @@ python src/score_gdelt_news.py \
   --max-days-before 5 \
   --batch-size 200 \
   --run-label "baseline-score" \
-  --model openai/gpt-5 \
-  --reasoning-mode thinking
+  --model minimax
 ```
 
 ### 5. View results
@@ -134,10 +132,10 @@ Tip: use `config/predict_config.example.json` as a template and pass `--config` 
 
 ## Customization tips (for model and pipeline experiments)
 
-- OpenRouter model choice: `batch/src/score_gdelt_news.py` accepts `--model`, so you can switch among models available via OpenRouter.
-- Prompt tuning: the built-in OpenRouter prompt lives in `batch/src/article_scorers.py` (`_build_prompt_messages`). Edit the system/user messages (categories, instructions, output format) to adapt the built-in scorer.
+- Model choice: `batch/src/score_gdelt_news.py` accepts `--model <trade adapter id>` and scores through Trade's own LLM adapter registry (OpenRouter is not used).
+- Prompt tuning: the built-in prompt lives in `batch/src/article_scorers.py` (`_build_prompt_messages`). Edit the system/user messages (categories, instructions, output format) to adapt the built-in scorer.
 - Custom model evaluation: implement a Python article scorer that returns a 1-5 score plus reason, then pass it with `--scorer-class module.path:ClassName`. See [How to evaluate your model](docs/how-to-evaluate-your-model.md).
-- Running inside the Trade monorepo without an OpenRouter key: pass `--scorer-class trade_adapter_article_scorer:TradeAdapterArticleScorer` instead of `--model`. This built-in scorer (`batch/src/trade_adapter_article_scorer.py`) reuses the same prompt/parsing as the OpenRouter scorer but calls Trade's own LLM adapter registry (`integrations/trade_integrations/dataflows/model_adapters/`) — only works when ed-alpha is checked out as a Trade submodule. This works directly when batch scripts run host-side inside the Trade checkout; to use it from the containerized `batch` service instead, start it with the optional `docker-compose.trade.yaml` override (Trade-submodule checkouts only — see that file's own comments for what it adds and why it's a separate file):
+- The `--model` scorer is `trade_adapter_article_scorer:TradeAdapterArticleScorer` (also usable via `--scorer-class`). It (`batch/src/trade_adapter_article_scorer.py`) reuses the one prompt/parsing in `article_scorers.py` and calls Trade's own LLM adapter registry (`integrations/trade_integrations/dataflows/model_adapters/`) — only works when ed-alpha is checked out as a Trade submodule. This works directly when batch scripts run host-side inside the Trade checkout; to use it from the containerized `batch` service instead, start it with the optional `docker-compose.trade.yaml` override (Trade-submodule checkouts only — see that file's own comments for what it adds and why it's a separate file):
   ```bash
   docker compose -f docker-compose.yaml -f docker-compose.trade.yaml --profile batch up -d batch
   docker compose -f docker-compose.yaml -f docker-compose.trade.yaml exec -it batch sh

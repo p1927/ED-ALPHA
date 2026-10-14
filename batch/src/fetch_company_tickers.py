@@ -119,6 +119,34 @@ def upsert_company_tickers(
     connection.commit()
 
 
+#: A feed this small is a truncated/failed download, not the SEC list: never prune from it.
+MIN_FEED_PAIRS_FOR_PRUNE = 1000
+
+
+def delete_stale_company_tickers(
+    connection: psycopg2.extensions.connection, ticker_pairs: List[Tuple[int, str]]
+) -> int:
+    """Delete (cik, ticker) rows the SEC no longer lists (a reassigned ticker kept pointing at its old CIK)."""
+    if len(ticker_pairs) < MIN_FEED_PAIRS_FOR_PRUNE:
+        return 0
+    ciks = [cik for cik, _ in ticker_pairs]
+    tickers = [ticker for _, ticker in ticker_pairs]
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DELETE FROM company_tickers ct
+            WHERE NOT EXISTS (
+                SELECT 1 FROM unnest(%s::bigint[], %s::text[]) AS t(cik, ticker)
+                WHERE t.cik = ct.cik AND t.ticker = ct.ticker
+            )
+            """,
+            (ciks, tickers),
+        )
+        removed = cursor.rowcount
+    connection.commit()
+    return removed
+
+
 def main() -> None:
     config = load_configuration()
 
@@ -137,8 +165,10 @@ def main() -> None:
     try:
         upsert_company_profiles(connection, profiles)
         upsert_company_tickers(connection, ticker_pairs)
+        removed = delete_stale_company_tickers(connection, ticker_pairs)
         print(
-            f"Upserted {len(profiles)} company profiles and {len(ticker_pairs)} ticker associations."
+            f"Upserted {len(profiles)} company profiles and {len(ticker_pairs)} ticker associations; "
+            f"removed {removed} stale associations."
         )
     finally:
         connection.close()

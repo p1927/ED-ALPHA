@@ -66,13 +66,27 @@ def find_matching_ciks(
     matches: Set[int] = set()
     for idx in range(start_index, end_index):
         title = titles[idx]
-        if title.startswith(organization):
+        if title.startswith(organization) and _only_legal_suffix(title[len(organization):]):
             if organization == "united states":
                 # "UNITED STATES ..." org strings overmatch (CIK 101538 = UNITED STATES ANTIMONY CORP); skip entirely.
                 continue
             matches.add(ciks[idx])
 
     return matches
+
+
+_LEGAL_SUFFIXES = frozenset(
+    {"inc", "inc.", "corp", "corp.", "corporation", "co", "co.", "company", "ltd", "ltd.", "limited",
+     "plc", "llc", "lp", "l.p.", "n.v.", "s.a.", "ag", "sa", "nv", "/de/", "/new", "/ny/", "/md/", "/nv/"}
+)
+
+
+def _only_legal_suffix(rest: str) -> bool:
+    """True when what follows the organization name is nothing or only legal-form words.
+
+    A bare ``startswith`` linked "apple" to "apple hospitality reit" and "ford" to "ford motor credit".
+    """
+    return all(word in _LEGAL_SUFFIXES for word in rest.split())
 
 
 def iter_organizations(raw_value: str) -> Iterable[str]:
