@@ -503,7 +503,7 @@ async def get_prediction_by_ticker(
             FROM company_recent_filings f
             WHERE f.cik = $1
               AND f.form ILIKE '8-K%%'
-              AND (f.filing_date IS NULL OR (f.filing_date >= $2 AND f.filing_date <= $3))
+              AND (f.filing_date >= $2 AND f.filing_date <= $3)
             ORDER BY f.filing_date DESC NULLS LAST
             LIMIT 1
             """,
@@ -545,13 +545,22 @@ async def get_prediction_by_ticker(
             predict_date=predict_date,
             horizon_days=horizon_days,
             evidence=evidence,
-            event=event,
-            detail=f"{symbol} not ranked in run_id={run_id}; company may be outside top-K.",
+            event=None,
+            detail=f"{symbol} is not in the experiment label set (run_id={run_id}); not ranked in run_id={run_id}; company may be outside top-K.",
         )
 
+    # CEO decision 2026-10-14: the ranked set is a BACK-TEST label set (filers inside the horizon
+    # plus news-matched non-filers, chosen with knowledge of the outcome), so membership, rank and
+    # the realised `event` carry future knowledge. Serve it as an evaluation payload with a status
+    # no live consumer treats as a forecast (Trade's corp_events only accepts "ok"), and never
+    # return the realised filing next to it.
     return TickerPrediction(
         ticker=symbol,
-        status="ok",
+        status="evaluation_only",
+        detail=(
+            "Back-test label set: score/rank/evidence are research-only and must not drive a live "
+            "decision; the realised filing is withheld."
+        ),
         cik=cik,
         company_name=company_name,
         total_score=int(score_row["total_score"]),
@@ -561,7 +570,7 @@ async def get_prediction_by_ticker(
         predict_date=predict_date,
         horizon_days=horizon_days,
         evidence=evidence,
-        event=event,
+        event=None,
     )
 
 

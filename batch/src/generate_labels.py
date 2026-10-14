@@ -456,6 +456,7 @@ def main() -> None:
         )
 
         positive_counts_full = {cik: news_counts[cik] for cik in positives}
+        all_positive_ciks = frozenset(positives)  # every real filer, before any sampling
         if max_positive_samples is not None and len(positives) > max_positive_samples:
             rng = random.Random(sample_seed)
             ordered_ciks = sorted(positives)
@@ -475,7 +476,8 @@ def main() -> None:
             )
 
         positive_counts = {cik: positive_counts_full[cik] for cik in positives}
-        negative_counts = {cik: count for cik, count in news_counts.items() if cik not in positives}
+        # A positive dropped by max_positive_samples DID file; it must not come back as a negative.
+        negative_counts = {cik: count for cik, count in news_counts.items() if cik not in all_positive_ciks}
 
         if not negative_counts:
             logging.warning("No negative candidates available within the news window. Aborting.")

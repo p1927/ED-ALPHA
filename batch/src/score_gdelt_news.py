@@ -258,7 +258,11 @@ def get_article_content(
         response.raise_for_status()
     except requests.RequestException as exc:
         err_msg = f"HTTP error: {exc}"
-        upsert_article(connection, article_url, None, None, err_msg[:512])
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        # Only a permanent client error (404/410/403...) is cached as a fetch_error; a timeout,
+        # 408/429 or 5xx is transient and must be retried by the next run, not stored forever.
+        if status is not None and 400 <= status < 500 and status not in (408, 429):
+            upsert_article(connection, article_url, None, None, err_msg[:512])
         raise ArticleFetchError(err_msg) from exc
 
     response.encoding = response.encoding or response.apparent_encoding

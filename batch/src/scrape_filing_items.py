@@ -14,7 +14,7 @@ from psycopg2.extras import execute_values
 from bs4 import BeautifulSoup, NavigableString, Tag
 from bs4.element import Comment
 
-from config import load_configuration
+from config import build_user_agent, load_configuration
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
@@ -72,10 +72,14 @@ def build_filing_url(cik: int, accession_number: str, primary_document: str) -> 
     return f"{SEC_BASE_URL}/{clean_cik}/{accession_fragment}/{primary_document}"
 
 
+def _sec_user_agent() -> str:
+    return build_user_agent(load_configuration()["user_email"])
+
+
 def fetch_html(url: str) -> str:
     headers = {
-        # SEC は UA 明示を推奨
-        "User-Agent": "Mozilla/5.0 (compatible; FilingItemScraper/1.0; +https://example.com/)",
+        # SEC requires a User-Agent naming a real contact (the placeholder URL is blocked with 403).
+        "User-Agent": _sec_user_agent(),
         "Accept": "text/html,application/xhtml+xml",
     }
     response = requests.get(url, headers=headers, timeout=30)
@@ -347,6 +351,8 @@ def main() -> None:
                 html = fetch_html(url)
             except requests.RequestException as exc:
                 logging.warning("Failed to fetch %s: %s", url, exc)
+                if args.delay > 0:
+                    time.sleep(args.delay)  # a failure still counts against SEC's 10 req/s
                 continue
 
             sections = scrape_to_rows(html)
@@ -376,6 +382,13 @@ def main() -> None:
             if args.delay > 0:
                 time.sleep(args.delay)
 
+        # ON CONFLICT DO UPDATE cannot touch one key twice in a statement: keep the longest text.
+        deduped: dict[tuple, tuple] = {}
+        for row in upsert_rows:
+            key = (row[1], row[2], row[3])
+            if key not in deduped or len(row[7] or "") > len(deduped[key][7] or ""):
+                deduped[key] = row
+        upsert_rows = list(deduped.values())
         upsert_item_sections(connection, upsert_rows, args.batch_size)
         logging.info("Stored %d item sections.", len(upsert_rows))
     finally:
