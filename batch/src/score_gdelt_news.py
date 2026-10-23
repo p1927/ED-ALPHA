@@ -247,8 +247,9 @@ def get_article_content(
         "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
     }
     try:
-        response = session.get(article_url, headers=headers, timeout=15)
-        response.raise_for_status()
+        from article_fetch import fetch_article_html
+
+        html_text = fetch_article_html(session, article_url, headers=headers)
     except requests.RequestException as exc:
         err_msg = f"HTTP error: {exc}"
         status = getattr(getattr(exc, "response", None), "status_code", None)
@@ -258,8 +259,6 @@ def get_article_content(
             upsert_article(connection, article_url, None, None, err_msg[:512])
         raise ArticleFetchError(err_msg) from exc
 
-    response.encoding = response.encoding or response.apparent_encoding
-    html_text = response.text
     title, snippet = extract_title_and_snippet(html_text)
     if not title and not snippet:
         err_msg = "Failed to extract title or snippet."
