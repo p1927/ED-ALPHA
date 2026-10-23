@@ -433,8 +433,6 @@ def main() -> None:
 
     user_agent = build_user_agent(config["user_email"])
 
-    args.reasoning_mode = args.reasoning_mode.lower()
-
     batch_size = max(args.batch_size, 1)
 
     try:
@@ -507,14 +505,20 @@ def main() -> None:
                 batch_size,
             ):
                 processed += 1
+                if article_url in failed_articles:
+                    skipped_scorer += 1
+                    continue
                 fetch_start = time.perf_counter()
                 try:
-                    title, snippet = get_article_content(
-                        connection,
-                        article_session,
-                        article_url,
-                        user_agent,
-                    )
+                    if article_url in score_cache:
+                        title, snippet = None, None  # the existing score is all this company row needs
+                    else:
+                        title, snippet = get_article_content(
+                            connection,
+                            article_session,
+                            article_url,
+                            user_agent,
+                        )
                     fetch_duration = time.perf_counter() - fetch_start
                 except ArticleFetchError as exc:
                     fetch_duration = time.perf_counter() - fetch_start
@@ -584,11 +588,12 @@ def main() -> None:
             f"skipped (scorer failures) {skipped_scorer}.",
             file=sys.stderr,
         )
-        mark_run_partial(connection, run_id, bool(skipped_scorer))
-        if skipped_scorer:
+        skipped = skipped_fetch + skipped_missing + skipped_scorer
+        mark_run_partial(connection, run_id, bool(skipped))
+        if skipped:
             # The run's rows are kept, but it is PARTIAL (marked in the DB): say so in the exit status.
             raise SystemExit(
-                f"Run {run_id} is partial: {skipped_scorer} articles were not scored; "
+                f"Run {run_id} is partial: {skipped} article/company rows were not scored; "
                 "its total_score understates those companies."
             )
     finally:
